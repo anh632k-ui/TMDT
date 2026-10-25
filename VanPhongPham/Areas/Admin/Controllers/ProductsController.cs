@@ -108,6 +108,8 @@ public sealed class ProductsController : Controller
 
     private async Task ValidateFormAsync(ProductFormVm vm)
     {
+        if (vm.Price != decimal.Truncate(vm.Price))
+            ModelState.AddModelError(nameof(vm.Price), "Giá bán phải là số nguyên VNĐ");
         if (!await _db.Categories.AnyAsync(x => x.Id == vm.CategoryId))
             ModelState.AddModelError(nameof(vm.CategoryId), "Danh mục không tồn tại");
         if (vm.Image is not { } f) return;
