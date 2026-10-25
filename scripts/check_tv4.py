@@ -125,7 +125,7 @@ class Tv4StaticChecks(unittest.TestCase):
     def test_no_accidental_razor_page_directive(self):
         for view in (APP / "Areas/Admin/Views").rglob("*.cshtml"):
             with self.subTest(view=view.name):
-                self.assertNotRegex(view.read_text("utf-8"), r"@page\\b")
+                self.assertNotRegex(view.read_text("utf-8"), r"@page\b")
 
     def test_payment_and_admin_razor_forms_have_anti_forgery(self):
         views = (
