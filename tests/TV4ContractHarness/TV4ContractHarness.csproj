@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.10" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.10" />
+    <Compile Include="../../VanPhongPham/Areas/Admin/Controllers/*.cs" Link="Areas/Admin/Controllers/%(Filename)%(Extension)" />
+    <Compile Include="../../VanPhongPham/Areas/Admin/ViewModels/*.cs" Link="Areas/Admin/ViewModels/%(Filename)%(Extension)" />
+    <Compile Include="../../VanPhongPham/Controllers/PaymentController.cs" Link="Controllers/PaymentController.cs" />
+    <Compile Include="../../VanPhongPham/Data/DbSeeder.cs" Link="Data/DbSeeder.cs" />
+  </ItemGroup>
+</Project>

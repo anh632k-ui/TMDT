@@ -1,0 +1,65 @@
+name: TV4 static audit and isolated .NET build
+
+on:
+  push:
+    branches: [tv4-quantri]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  tv4-static:
+    name: Check TV4 files and test matrix
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Python 3 file checks
+        run: python3 scripts/check_tv4.py
+
+  tv4-standalone:
+    name: Compile TV4 against contract stubs (not full integration)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+      - name: Copy Razor views into temporary compile harness
+        shell: bash
+        run: |
+          mkdir -p tests/TV4ContractHarness/Areas/Admin/Views
+          mkdir -p tests/TV4ContractHarness/Views/Payment
+          cp -R VanPhongPham/Areas/Admin/Views/. tests/TV4ContractHarness/Areas/Admin/Views/
+          cp -R VanPhongPham/Views/Payment/. tests/TV4ContractHarness/Views/Payment/
+      - name: Restore contract harness
+        run: dotnet restore tests/TV4ContractHarness/TV4ContractHarness.csproj
+      - name: Compile controllers, ViewModels, DbSeeder and Razor views
+        run: dotnet build tests/TV4ContractHarness/TV4ContractHarness.csproj --no-restore -c Release
+
+  integration-when-tv3-arrives:
+    name: Compile actual VanPhongPham if TV3 project exists
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+      - name: Detect core project
+        id: core
+        shell: bash
+        run: |
+          if [ -f VanPhongPham/VanPhongPham.csproj ]; then
+            echo "available=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "available=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::Project TV3 chua co, bo qua build tich hop (KHONG phai PASS tich hop)."
+          fi
+      - name: Restore core project
+        if: steps.core.outputs.available == 'true'
+        run: dotnet restore VanPhongPham/VanPhongPham.csproj
+      - name: Build actual application
+        if: steps.core.outputs.available == 'true'
+        run: dotnet build VanPhongPham/VanPhongPham.csproj --no-restore -c Release
