@@ -1,0 +1,26 @@
+@using System.Globalization
+@model object
+@{
+    ViewData["Title"] = "Tổng quan";
+    var vi = new CultureInfo("vi-VN");
+    var recent = (IEnumerable<Order>)ViewBag.RecentOrders;
+}
+<h1 class="h3 mb-4">Tổng quan cửa hàng</h1>
+<div class="row g-3 mb-4">
+    <div class="col-md-4"><div class="card"><div class="card-body"><div class="text-muted">Sản phẩm</div><div class="display-6">@ViewBag.ProductCount</div></div></div></div>
+    <div class="col-md-4"><div class="card"><div class="card-body"><div class="text-muted">Đơn hàng</div><div class="display-6">@ViewBag.OrderCount</div></div></div></div>
+    <div class="col-md-4"><div class="card"><div class="card-body"><div class="text-muted">Voucher</div><div class="display-6">@ViewBag.VoucherCount</div></div></div></div>
+</div>
+<h2 class="h5">Đơn hàng gần đây</h2>
+<div class="table-responsive">
+<table class="table table-striped">
+<thead><tr><th>Mã đơn</th><th>Ngày tạo</th><th>Trạng thái</th><th class="text-end">Tổng</th><th></th></tr></thead>
+<tbody>
+@foreach (var o in recent) {
+<tr><td>#@o.Id</td><td>@o.CreatedAt.ToString("dd/MM/yyyy HH:mm")</td><td>@o.Status</td>
+<td class="text-end">@o.Total.ToString("N0",vi)đ</td>
+<td><a asp-area="Admin" asp-controller="Orders" asp-action="Details" asp-route-id="@o.Id">Chi tiết</a></td></tr>
+}
+</tbody>
+</table>
+</div>

@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>@ViewData["Title"] – Quản trị VPP</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" asp-append-version="true" />
+    <style>
+        body{background:#f6f7fb;color:#1e293b}
+        .admin-bar{background:#16324f;color:white}
+        .admin-bar a{color:white;text-decoration:none}
+        .admin-menu{background:white;border-radius:12px;padding:16px}
+        .admin-menu a{display:block;padding:10px 12px;text-decoration:none;color:#334155;border-radius:8px}
+        .admin-menu a:hover{background:#eef2ff;color:#1d4ed8}
+        .admin-content{background:white;border-radius:12px;padding:20px;min-height:70vh}
+        .table td,.table th{vertical-align:middle}
+    </style>
+</head>
+<body>
+    <header class="admin-bar py-3">
+        <div class="container-fluid d-flex justify-content-between align-items-center">
+            <strong>Văn phòng phẩm · Quản trị</strong>
+            <a asp-area="" asp-controller="Home" asp-action="Index">Về trang mua sắm</a>
+        </div>
+    </header>
+    <div class="container-fluid py-4">
+        <div class="row g-4">
+            <aside class="col-12 col-lg-2">
+                <nav class="admin-menu" aria-label="Điều hướng quản trị">
+                    <a asp-area="Admin" asp-controller="Home" asp-action="Index">Tổng quan</a>
+                    <a asp-area="Admin" asp-controller="Products" asp-action="Index">Sản phẩm</a>
+                    <a asp-area="Admin" asp-controller="Orders" asp-action="Index">Đơn hàng</a>
+                    <a asp-area="Admin" asp-controller="Vouchers" asp-action="Index">Voucher</a>
+                </nav>
+            </aside>
+            <main class="col-12 col-lg-10">
+                <section class="admin-content">
+                    @if (TempData["Success"] != null) {
+                        <div class="alert alert-success" role="status">@TempData["Success"]</div>
+                    }
+                    @if (TempData["Error"] != null) {
+                        <div class="alert alert-danger" role="alert">@TempData["Error"]</div>
+                    }
+                    @RenderBody()
+                </section>
+            </main>
+        </div>
+    </div>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>
