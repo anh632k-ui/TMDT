@@ -114,7 +114,7 @@ public sealed class VouchersController : Controller
     {
         var v = await _db.Vouchers.FindAsync(id);
         if (v == null) return NotFound();
-        if (await _db.VoucherUsages.AnyAsync(x => x.VoucherId == id)) {
+        if (v.UsedCount > 0 || await _db.VoucherUsages.AnyAsync(x => x.VoucherId == id)) {
             TempData["Error"] = "Voucher đã có lịch sử: chỉ được tắt, không được xóa";
             return RedirectToAction(nameof(Index));
         }
@@ -137,12 +137,17 @@ public sealed class VouchersController : Controller
             ModelState.AddModelError(nameof(vm.Type), "Loại voucher không hợp lệ");
         if (vm.EndAt <= vm.StartAt)
             ModelState.AddModelError(nameof(vm.EndAt), "Ngày kết thúc phải sau ngày bắt đầu");
+        if (!System.Text.RegularExpressions.Regex.IsMatch(vm.Code, "^[A-Z0-9_-]{2,30}$"))
+            ModelState.AddModelError(nameof(vm.Code), "Mã voucher không hợp lệ sau khi chuẩn hóa");
         if (vm.Type == VoucherType.Percent && (vm.Value < 1 || vm.Value > 100))
             ModelState.AddModelError(nameof(vm.Value), "Phần trăm phải từ 1 đến 100");
         if (vm.Type != VoucherType.Shipping && vm.Value <= 0)
             ModelState.AddModelError(nameof(vm.Value), "Giá trị giảm phải lớn hơn 0");
         if (vm.MaxDiscount is < 0)
             ModelState.AddModelError(nameof(vm.MaxDiscount), "Mức giảm tối đa không được âm");
+        if (ignoredId.HasValue && vm.TotalLimit.HasValue &&
+            await _db.Vouchers.AnyAsync(x => x.Id == ignoredId.Value && x.UsedCount > vm.TotalLimit.Value))
+            ModelState.AddModelError(nameof(vm.TotalLimit), "Tổng lượt không được nhỏ hơn số lượt đã sử dụng");
         if (await _db.Vouchers.AnyAsync(x => x.Code == vm.Code && (!ignoredId.HasValue || x.Id != ignoredId.Value)))
             ModelState.AddModelError(nameof(vm.Code), "Mã voucher đã tồn tại");
         var ci=vm.IncludeCategoryIds ?? Array.Empty<int>(); var ce=vm.ExcludeCategoryIds ?? Array.Empty<int>();
