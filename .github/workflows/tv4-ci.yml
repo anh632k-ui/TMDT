@@ -39,15 +39,14 @@ jobs:
       - name: Compile controllers, ViewModels, DbSeeder and Razor views
         run: dotnet build tests/TV4ContractHarness/TV4ContractHarness.csproj --no-restore -c Release
 
-  integration-when-tv3-arrives:
-    name: Compile actual VanPhongPham if TV3 project exists
+  detect-tv3-project:
+    name: Detect whether TV3 project exists
     runs-on: ubuntu-latest
+    outputs:
+      available: ${{ steps.core.outputs.available }}
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: '8.0.x'
-      - name: Detect core project
+      - name: Check presence of application csproj
         id: core
         shell: bash
         run: |
@@ -55,11 +54,20 @@ jobs:
             echo "available=true" >> "$GITHUB_OUTPUT"
           else
             echo "available=false" >> "$GITHUB_OUTPUT"
-            echo "::notice::Project TV3 chua co, bo qua build tich hop (KHONG phai PASS tich hop)."
+            echo "::notice::Chua co project TV3; build tich hop se bi SKIPPED, khong tinh PASS."
           fi
-      - name: Restore core project
-        if: steps.core.outputs.available == 'true'
+
+  integration-when-tv3-arrives:
+    name: Actual application build (requires TV3)
+    needs: detect-tv3-project
+    if: needs.detect-tv3-project.outputs.available == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+      - name: Restore actual application
         run: dotnet restore VanPhongPham/VanPhongPham.csproj
       - name: Build actual application
-        if: steps.core.outputs.available == 'true'
         run: dotnet build VanPhongPham/VanPhongPham.csproj --no-restore -c Release
