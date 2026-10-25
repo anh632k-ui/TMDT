@@ -122,6 +122,11 @@ class Tv4StaticChecks(unittest.TestCase):
         self.assertTrue(all(not r["Kết quả thực tế"].strip() for r in rows))
         self.assertTrue(all(r["Trạng thái"] == "Chưa chạy" for r in rows))
 
+    def test_no_accidental_razor_page_directive(self):
+        for view in (APP / "Areas/Admin/Views").rglob("*.cshtml"):
+            with self.subTest(view=view.name):
+                self.assertNotRegex(view.read_text("utf-8"), r"@page\\b")
+
     def test_payment_and_admin_razor_forms_have_anti_forgery(self):
         views = (
             "Areas/Admin/Views/Products/Index.cshtml",
