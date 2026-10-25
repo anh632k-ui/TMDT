@@ -1,0 +1,58 @@
+@using System.Globalization
+@model List<Product>
+@{
+    ViewData["Title"] = "Quản lý sản phẩm";
+    var vi = new CultureInfo("vi-VN");
+    var cats = (IEnumerable<Category>)ViewBag.Categories;
+    var names = (Dictionary<int,string>)ViewBag.CategoryNames;
+    var page = (int)ViewBag.Page;
+    var pages = (int)ViewBag.Pages;
+}
+<div class="d-flex justify-content-between align-items-center mb-3 gap-2 flex-wrap">
+    <h1 class="h3 m-0">Quản lý sản phẩm</h1>
+    <a class="btn btn-primary" asp-action="Create">+ Thêm sản phẩm</a>
+</div>
+<form method="get" class="row g-2 mb-3">
+    <div class="col-md-5"><input class="form-control" name="q" placeholder="Tìm theo tên" value="@ViewBag.Q" aria-label="Tên sản phẩm" /></div>
+    <div class="col-md-4">
+        <select class="form-select" name="categoryId" aria-label="Danh mục">
+            <option value="">Tất cả danh mục</option>
+            @foreach (var c in cats) {
+                <option value="@c.Id" selected="@(c.Id == (int?)ViewBag.CategoryId)">@c.Name</option>
+            }
+        </select>
+    </div>
+    <div class="col-md-3"><button class="btn btn-outline-primary w-100">Lọc sản phẩm</button></div>
+</form>
+<div class="table-responsive">
+<table class="table table-hover">
+<thead><tr><th>Ảnh</th><th>Tên</th><th>Danh mục</th><th class="text-end">Giá</th><th class="text-end">Tồn</th><th>Trạng thái</th><th>Thao tác</th></tr></thead>
+<tbody>
+@foreach (var p in Model) {
+<tr>
+<td><img src="@(p.ImageUrl ?? "/images/products/placeholder.svg")" alt="" width="52" height="52" style="object-fit:contain" /></td>
+<td>@p.Name</td><td>@(names.TryGetValue(p.CategoryId, out var n) ? n : "—")</td>
+<td class="text-end">@p.Price.ToString("N0",vi)đ</td><td class="text-end">@p.Stock</td>
+<td><span class="badge @(p.IsActive ? "bg-success" : "bg-secondary")">@(p.IsActive ? "Đang bán" : "Đã ẩn")</span></td>
+<td>
+    <div class="d-flex gap-2">
+        <a class="btn btn-sm btn-outline-primary" asp-action="Edit" asp-route-id="@p.Id">Sửa</a>
+        <form asp-action="ToggleActive" asp-route-id="@p.Id" method="post">
+            @Html.AntiForgeryToken()
+            <button type="submit" class="btn btn-sm btn-outline-secondary">@(p.IsActive ? "Ẩn" : "Hiện")</button>
+        </form>
+    </div>
+</td>
+</tr>
+}
+@if (Model.Count == 0) { <tr><td colspan="7" class="text-center text-muted py-4">Không tìm thấy sản phẩm</td></tr> }
+</tbody>
+</table>
+</div>
+<nav aria-label="Phân trang sản phẩm"><div class="d-flex align-items-center gap-2">
+    <a class="btn btn-sm btn-outline-secondary @(page == 1 ? "disabled" : "")" asp-action="Index" asp-route-q="@ViewBag.Q"
+       asp-route-categoryId="@ViewBag.CategoryId" asp-route-page="@(page - 1)">Trước</a>
+    <span>Trang @page / @pages</span>
+    <a class="btn btn-sm btn-outline-secondary @(page == pages ? "disabled" : "")" asp-action="Index" asp-route-q="@ViewBag.Q"
+       asp-route-categoryId="@ViewBag.CategoryId" asp-route-page="@(page + 1)">Sau</a>
+</div></nav>
