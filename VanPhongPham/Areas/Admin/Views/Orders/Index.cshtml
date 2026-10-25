@@ -35,6 +35,6 @@
 </tbody></table></div>
 <nav aria-label="Phân trang đơn hàng"><div class="d-flex align-items-center gap-2">
 <a class="btn btn-outline-secondary btn-sm @(page <= 1 ? "disabled" : "")" asp-action="Index" asp-route-page="@(page - 1)" asp-route-status="@ViewBag.Status" asp-route-from="@(((DateTime?)ViewBag.From)?.ToString("yyyy-MM-dd"))" asp-route-to="@(((DateTime?)ViewBag.To)?.ToString("yyyy-MM-dd"))">Trước</a>
-Trang @page / @pages
+Trang @(page) / @(pages)
 <a class="btn btn-outline-secondary btn-sm @(page >= pages ? "disabled" : "")" asp-action="Index" asp-route-page="@(page + 1)" asp-route-status="@ViewBag.Status" asp-route-from="@(((DateTime?)ViewBag.From)?.ToString("yyyy-MM-dd"))" asp-route-to="@(((DateTime?)ViewBag.To)?.ToString("yyyy-MM-dd"))">Sau</a>
 </div></nav>
