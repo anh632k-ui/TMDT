@@ -52,7 +52,7 @@
 <nav aria-label="Phân trang sản phẩm"><div class="d-flex align-items-center gap-2">
     <a class="btn btn-sm btn-outline-secondary @(page == 1 ? "disabled" : "")" asp-action="Index" asp-route-q="@ViewBag.Q"
        asp-route-categoryId="@ViewBag.CategoryId" asp-route-page="@(page - 1)">Trước</a>
-    <span>Trang @page / @pages</span>
+    <span>Trang @(page) / @(pages)</span>
     <a class="btn btn-sm btn-outline-secondary @(page == pages ? "disabled" : "")" asp-action="Index" asp-route-q="@ViewBag.Q"
        asp-route-categoryId="@ViewBag.CategoryId" asp-route-page="@(page + 1)">Sau</a>
 </div></nav>
