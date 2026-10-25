@@ -1,0 +1,83 @@
+# TV4 – Quản trị, thanh toán, dữ liệu mẫu và kiểm thử
+
+## Phạm vi
+
+Thực hiện đúng phần việc TV4 của đồ án **Website bán văn phòng phẩm trực tuyến** (.NET 8 ASP.NET Core MVC, EF Core, SQL Server, Identity).
+
+- `VanPhongPham/Areas/Admin/Controllers`: Home, Products, Orders, Vouchers.
+- `VanPhongPham/Areas/Admin/ViewModels`: form nhập sản phẩm, voucher.
+- `VanPhongPham/Areas/Admin/Views`: layout, dashboard, CRUD sản phẩm, đơn hàng, voucher và thống kê lượt dùng.
+- `VanPhongPham/Controllers/PaymentController.cs` và `VanPhongPham/Views/Payment/Mock.cshtml`: thanh toán trực tuyến **GIẢ LẬP**.
+- `VanPhongPham/Data/DbSeeder.cs`: Admin demo, 4 danh mục, 24 sản phẩm, 9 mã voucher.
+- `docs/TV4/TEST_CASES.csv`: 14 ca voucher + 6 ca hệ thống (kết quả thực tế để trống đến khi chạy).
+- `docs/TV4/DEMO.md`: demo 5 phút, kiểm tra tích hợp.
+
+## Trạng thái hiện tại
+
+**Hoàn tất mã nguồn phần TV4 theo hợp đồng tài liệu. Chưa tích hợp/chưa chạy thực tế.**
+Repository ban đầu chỉ có README; chưa có .csproj, Models, DbContext, Services và View phía khách do TV2/TV3 phụ trách.
+Không được ghi ĐẠT cho bất kỳ ca kiểm thử nào khi chưa chạy.
+
+## Những gì cần TV3 cung cấp
+
+1. Dự án `VanPhongPham/VanPhongPham.csproj` dạng ASP.NET Core MVC (.NET 8), Identity + EF Core SQL Server.
+2. `VanPhongPham.Data.ApplicationDbContext`: `Categories`, `Products`, `Orders`, `OrderItems`, `Vouchers`, `VoucherScopes`, `VoucherUsages` và `Users`.
+3. `VanPhongPham.Models`: `Category`, `Product`, `Order`, `OrderItem`, `Voucher`, `VoucherScope`, `VoucherUsage`. Các trường, enums `VoucherType`, `OrderStatus` và `UsageStatus` đúng theo tài liệu TV3.
+4. `VanPhongPham.Services.IOrderService` với **chữ ký thống nhất**:
+   ```csharp
+   Task<(bool ok, string message)> ChangeStatusAsync(int orderId, OrderStatus status);
+   Task<(bool ok, string message)> CancelAsync(int orderId, string? userId, bool isAdmin);
+   Task MarkPaidAsync(int orderId);
+   ```
+   *Nếu dịch vụ TV3 dùng tên/chữ ký khác, hai thành viên phải thống nhất và điều chỉnh controller TV4 trước khi tích hợp.*
+5. `ChangeStatusAsync` phải từ chối chuyển trạng thái sai thứ tự; `MarkPaidAsync` phải idempotent (không ghi nhận hai lần); `CancelAsync` phải hoàn lượt voucher một lần duy nhất. Mọi cập nhật voucher do TV3 thực hiện trong transaction.
+6. TV3 cấu hình **role-based Identity** (`.AddRoles<IdentityRole>()`), đăng nhập; riêng Admin phải có role `Admin`.
+
+## Hai thay đổi Program.cs nhờ TV3 thực hiện
+
+Trong `Program.cs`, khi đã đăng ký `ApplicationDbContext`, Identity, IOrderService, route và middleware, thêm:
+
+```csharp
+// Route Area Admin phải khai báo trước route mặc định:
+app.MapControllerRoute(
+    name: "areas",
+    pattern: "{area:exists}/{controller=Home}/{action=Index}/{id?}");
+
+// Sau khi var app = builder.Build() và trước app.Run():
+using (var scope = app.Services.CreateScope())
+{
+    await VanPhongPham.Data.DbSeeder.SeedAsync(scope.ServiceProvider);
+}
+```
+
+Với `DbSeeder`, TV3 cần bảo đảm EF Migrations đã được tạo. Môi trường demo tạo tài khoản `admin@vpp.local` / `Admin@123` khi chưa tồn tại; mật khẩu này không được triển khai sản phẩm thật. Có thể đặt `TV4_DEMO_ADMIN_PASSWORD` để thay mật khẩu seed mới.
+
+TV3: Sau `Checkout/PlaceOrder`, nếu chọn `Online`, điều hướng `/Payment/Mock/{orderId}`. Nếu `COD`, đơn ở `Pending` và chuyển về `Orders/Success`. URL Mock không thanh toán thật.
+
+TV2: Giữ `Views/Checkout` và JS voucher thuộc TV2, không di chuyển vào `Views/Payment`. TV4 chỉ phụ trách mock sau đặt hàng.
+
+## Chạy sau khi tích hợp
+
+```powershell
+git clone https://github.com/anh632k-ui/TMDT.git
+cd TMDT
+git switch tv4-quantri
+# Khi TV3 đã có .csproj + migration trong nhánh tích hợp:
+cd VanPhongPham
+dotnet restore
+dotnet ef database update
+dotnet run
+```
+
+Kiểm tra: `/Admin`, `/Admin/Products`, `/Admin/Orders`, `/Admin/Vouchers`, `/Payment/Mock/{orderId}`.
+
+**Phân quyền:** khách thường bị chặn khỏi `/Admin`; trang mock chỉ hiển thị đơn `Online` của chính người đăng nhập. Mọi form thay đổi dữ liệu phải là POST và có anti-forgery token.
+
+## Lưu ý
+
+- Chỉ sửa phần TV4; không tự ý tạo/thay thế `Models/`, `Services/`, `Migrations/`, `Program.cs` của TV3.
+- Sản phẩm đã bán chỉ ẩn bằng `IsActive`; không xóa để giữ lịch sử đơn hàng.
+- Voucher có bản ghi `VoucherUsage` chỉ được tắt; không xóa.
+- Bộ dữ liệu seed tự tránh thêm trùng dựa trên tên/mã, phục vụ demo, không thay thế hệ thống import dữ liệu sản phẩm.
+- Các giá trị mã `HETHAN`, `SAPTOI`, `LUOTCUOI` phụ thuộc thời gian và trạng thái kiểm thử. Khi chạy lại demo, reset môi trường test có kiểm soát nếu các ca đã làm thay đổi số lượt.
+- Sau khi TV3 làm xong, chạy `dotnet build`, kiểm tra toàn bộ use case, ghi kết quả thực tế trong bảng test, chụp bằng chứng, quay demo và backup database.

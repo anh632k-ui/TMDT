@@ -1,0 +1,21 @@
+STT,Nhóm,Tình huống,Chuẩn bị/Các bước,Kết quả mong đợi,Kết quả thực tế,Trạng thái,Người sửa
+1,Voucher,Mã hợp lệ,"Giỏ 205000đ; ship 22000đ; áp VPP50","Giảm 20500đ; tổng 206500đ",,Chưa chạy,TV3
+2,Voucher,Mã không tồn tại,"Áp ABC123","Mã không tồn tại hoặc đã hết hạn; tiền không đổi",,Chưa chạy,TV3
+3,Voucher,Mã hết hạn,"Áp HETHAN","Mã không tồn tại hoặc đã hết hạn",,Chưa chạy,TV3
+4,Voucher,Chưa đến ngày,"Áp SAPTOI","Mã chưa tới ngày áp dụng",,Chưa chạy,TV3
+5,Voucher,Thiếu đơn tối thiểu,"Giỏ 100000đ; áp VPP50","Mua thêm 50000đ để dùng mã này",,Chưa chạy,TV3
+6,Voucher,Trần giảm tối đa,"Giỏ 1000000đ; áp VPP50","Giảm tối đa 50000đ",,Chưa chạy,TV3
+7,Voucher,Hết tổng lượt,"Áp HETLUOT","Mã đã hết lượt sử dụng",,Chưa chạy,TV3
+8,Voucher,Giới hạn mỗi người,"Tài khoản mới đặt 1 đơn dùng CHAOMUNG; thử lại","Bạn đã dùng tối đa số lần cho mã này",,Chưa chạy,TV3
+9,Voucher,Sai danh mục,"Giỏ chỉ có bút; áp GIAY10","Giỏ hàng không có sản phẩm thuộc danh mục áp dụng",,Chưa chạy,TV3
+10,Voucher,Cộng gộp được,"Giỏ từ 300000đ; áp VPP50 rồi FREESHIP","Áp cả hai; phí vận chuyển sau giảm = 0đ",,Chưa chạy,TV3
+11,Voucher,Thay mã cùng nhóm,"Áp VPP50 rồi GIAM20K","VPP50 được thay bởi GIAM20K và có thông báo",,Chưa chạy,TV3
+12,Voucher,Giỏ đổi sau khi áp mã,"Áp VPP50; giảm giỏ dưới 150000đ","Voucher tự gỡ; hiện lý do; tổng cập nhật",,Chưa chạy,TV3
+13,Voucher,Hủy đơn hoàn lượt,"Đặt đơn với VPP50; hủy đơn","VoucherUsage Released; UsedCount giảm đúng 1",,Chưa chạy,TV3
+14,Voucher,Tranh lượt cuối,"Hai tài khoản bấm đặt với LUOTCUOI gần đồng thời","Chỉ một đơn dùng mã thành công; đơn khác báo hết lượt",,Chưa chạy,TV3
+15,Hệ thống,Đăng nhập và phân quyền,"Customer đăng nhập rồi mở /Admin","Bị từ chối truy cập",,Chưa chạy,TV3
+16,Hệ thống,Quản trị sản phẩm,"Admin tạo sửa và ẩn sản phẩm có ảnh","Hiển thị đúng; ảnh lưu; sản phẩm ẩn khỏi phía khách",,Chưa chạy,TV4
+17,Hệ thống,Giỏ hàng và tồn kho,"Cho số lượng đặt vượt tồn kho","Server từ chối tạo đơn",,Chưa chạy,TV3
+18,Hệ thống,Đặt hàng giỏ rỗng,"Vào Checkout khi giỏ không có sản phẩm","Không tạo đơn rỗng",,Chưa chạy,TV3
+19,Hệ thống,Thanh toán mô phỏng,"Tạo đơn Online rồi thử Success và Cancel","Đơn đổi trạng thái theo IOrderService; không thu tiền thật",,Chưa chạy,TV4
+20,Hệ thống,Giao diện điện thoại,"Mở trang ở chế độ mobile F12","Không vỡ bố cục; nút dùng được",,Chưa chạy,TV2
