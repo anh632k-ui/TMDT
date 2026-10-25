@@ -1,0 +1,68 @@
+@model VoucherFormVm
+@{
+    var edit=Model.Id.HasValue;
+    ViewData["Title"]=edit ? "Sửa voucher" : "Thêm voucher";
+    var categories=(IEnumerable<Category>)ViewBag.Categories;
+    var products=(IEnumerable<Product>)ViewBag.Products;
+}
+<h1 class="h3 mb-4">@ViewData["Title"]</h1>
+<form asp-action="@(edit ? "Edit" : "Create")" asp-route-id="@Model.Id" method="post">
+    @Html.AntiForgeryToken()
+    <input asp-for="Id" type="hidden" />
+    <div asp-validation-summary="All" class="text-danger mb-3"></div>
+    <div class="row g-3">
+        <div class="col-md-4"><label asp-for="Code" class="form-label">Mã voucher</label>
+            <input asp-for="Code" class="form-control text-uppercase" maxlength="30" /><span asp-validation-for="Code" class="text-danger"></span></div>
+        <div class="col-md-4"><label asp-for="Type" class="form-label">Loại</label>
+            <select asp-for="Type" class="form-select" asp-items="Html.GetEnumSelectList<VoucherType>()"></select></div>
+        <div class="col-md-4"><label asp-for="Value" class="form-label">Giá trị (% hoặc VNĐ; ship 0 = miễn phí)</label>
+            <input asp-for="Value" type="number" step="1" min="0" class="form-control" /></div>
+        <div class="col-md-4"><label asp-for="MaxDiscount" class="form-label">Giảm tối đa (VNĐ)</label>
+            <input asp-for="MaxDiscount" type="number" step="1" min="0" class="form-control" /></div>
+        <div class="col-md-4"><label asp-for="MinOrder" class="form-label">Đơn tối thiểu</label>
+            <input asp-for="MinOrder" type="number" step="1" min="0" class="form-control" /></div>
+        <div class="col-md-4"><label asp-for="TotalLimit" class="form-label">Tổng lượt (để trống = không giới hạn)</label>
+            <input asp-for="TotalLimit" type="number" min="1" class="form-control" /></div>
+        <div class="col-md-4"><label asp-for="StartAt" class="form-label">Bắt đầu</label>
+            <input asp-for="StartAt" type="datetime-local" asp-format="{0:yyyy-MM-ddTHH:mm}" class="form-control" /></div>
+        <div class="col-md-4"><label asp-for="EndAt" class="form-label">Kết thúc</label>
+            <input asp-for="EndAt" type="datetime-local" asp-format="{0:yyyy-MM-ddTHH:mm}" class="form-control" /></div>
+        <div class="col-md-4"><label asp-for="PerUserLimit" class="form-label">Giới hạn/người (trống = không)</label>
+            <input asp-for="PerUserLimit" type="number" min="1" class="form-control" /></div>
+    </div>
+    <div class="form-check mt-3"><input asp-for="NewUserOnly" class="form-check-input" />
+        <label asp-for="NewUserOnly" class="form-check-label">Chỉ khách hàng mới</label></div>
+    <div class="form-check mb-4"><input asp-for="IsActive" class="form-check-input" />
+        <label asp-for="IsActive" class="form-check-label">Đang bật</label></div>
+    <h2 class="h5">Phạm vi áp dụng</h2>
+    <p class="text-muted small">Giữ Ctrl để chọn nhiều. Không chọn mục bao gồm nghĩa là áp dụng toàn bộ (trừ mục bị loại trừ).</p>
+    <div class="row g-3 mb-4">
+    <div class="col-md-6">
+        <label for="inc-cat" class="form-label">Bao gồm danh mục</label>
+        <select id="inc-cat" name="IncludeCategoryIds" multiple size="6" class="form-select">
+        @foreach (var c in categories) { <option value="@c.Id" selected="@(Model.IncludeCategoryIds.Contains(c.Id))">@c.Name</option> }
+        </select>
+    </div>
+    <div class="col-md-6">
+        <label for="exc-cat" class="form-label">Loại trừ danh mục</label>
+        <select id="exc-cat" name="ExcludeCategoryIds" multiple size="6" class="form-select">
+        @foreach (var c in categories) { <option value="@c.Id" selected="@(Model.ExcludeCategoryIds.Contains(c.Id))">@c.Name</option> }
+        </select>
+    </div>
+    <div class="col-md-6">
+        <label for="inc-prod" class="form-label">Bao gồm sản phẩm</label>
+        <select id="inc-prod" name="IncludeProductIds" multiple size="8" class="form-select">
+        @foreach (var p in products) { <option value="@p.Id" selected="@(Model.IncludeProductIds.Contains(p.Id))">@p.Name</option> }
+        </select>
+    </div>
+    <div class="col-md-6">
+        <label for="exc-prod" class="form-label">Loại trừ sản phẩm</label>
+        <select id="exc-prod" name="ExcludeProductIds" multiple size="8" class="form-select">
+        @foreach (var p in products) { <option value="@p.Id" selected="@(Model.ExcludeProductIds.Contains(p.Id))">@p.Name</option> }
+        </select>
+    </div>
+    </div>
+    <button class="btn btn-primary" type="submit">@(edit ? "Lưu thay đổi" : "Thêm voucher")</button>
+    <a asp-action="Index" class="btn btn-outline-secondary">Quay lại</a>
+</form>
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

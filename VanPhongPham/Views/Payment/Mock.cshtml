@@ -1,0 +1,31 @@
+@using System.Globalization
+@model Order
+@{
+    ViewData["Title"]="Thanh toán mô phỏng";
+    var vi=new CultureInfo("vi-VN");
+}
+<div class="container py-5" style="max-width:680px">
+<div class="card shadow-sm">
+<div class="card-body p-4">
+<h1 class="h3">Thanh toán trực tuyến (mô phỏng)</h1>
+<p class="alert alert-warning">Đây là giao dịch thử nghiệm, không thu tiền và không kết nối ngân hàng hay ví điện tử.</p>
+<dl class="row">
+<dt class="col-sm-5">Mã đơn</dt><dd class="col-sm-7">#@Model.Id</dd>
+<dt class="col-sm-5">Số tiền</dt><dd class="col-sm-7 fw-bold">@Model.Total.ToString("N0",vi)đ</dd>
+<dt class="col-sm-5">Trạng thái</dt><dd class="col-sm-7">@Model.Status</dd>
+</dl>
+@if (Model.Status == OrderStatus.Pending) {
+<div class="d-flex flex-wrap gap-2">
+<form asp-controller="Payment" asp-action="Success" asp-route-id="@Model.Id" method="post">
+    @Html.AntiForgeryToken()
+    <button class="btn btn-success">Thanh toán thành công</button>
+</form>
+<form asp-controller="Payment" asp-action="Cancel" asp-route-id="@Model.Id" method="post" onsubmit="return confirm('Hủy giao dịch mô phỏng và hủy đơn?')">
+    @Html.AntiForgeryToken()
+    <button class="btn btn-outline-danger">Hủy thanh toán</button>
+</form></div>
+} else {
+<div class="alert alert-info">Đơn không còn chờ thanh toán.</div>
+}
+<a asp-controller="Orders" asp-action="Index" class="d-block mt-4">Xem lịch sử đơn</a>
+</div></div></div>

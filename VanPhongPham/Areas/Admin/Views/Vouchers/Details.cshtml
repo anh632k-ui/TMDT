@@ -1,0 +1,34 @@
+@using System.Globalization
+@model Voucher
+@{
+    ViewData["Title"]="Voucher " + Model.Code;
+    var vi=new CultureInfo("vi-VN");
+    var scopes=(IEnumerable<VoucherScope>)ViewBag.Scopes;
+    var usages=(IEnumerable<VoucherUsage>)ViewBag.Usages;
+}
+<div class="d-flex justify-content-between align-items-center mb-3">
+<h1 class="h3">Voucher @Model.Code</h1>
+<a asp-action="Index" class="btn btn-outline-secondary">Danh sách voucher</a>
+</div>
+<dl class="row">
+<dt class="col-sm-3">Loại</dt><dd class="col-sm-9">@Model.Type</dd>
+<dt class="col-sm-3">Giá trị</dt><dd class="col-sm-9">@Model.Value.ToString("N0",vi)</dd>
+<dt class="col-sm-3">Đơn tối thiểu</dt><dd class="col-sm-9">@Model.MinOrder.ToString("N0",vi)đ</dd>
+<dt class="col-sm-3">Hiệu lực</dt><dd class="col-sm-9">@Model.StartAt.ToString("dd/MM/yyyy HH:mm") – @Model.EndAt.ToString("dd/MM/yyyy HH:mm")</dd>
+<dt class="col-sm-3">Lượt dùng</dt><dd class="col-sm-9">@Model.UsedCount / @(Model.TotalLimit?.ToString() ?? "Không giới hạn")</dd>
+<dt class="col-sm-3">Trạng thái</dt><dd class="col-sm-9">@(Model.IsActive ? "Bật" : "Tắt")</dd>
+</dl>
+<h2 class="h5">Phạm vi áp dụng</h2>
+<table class="table table-sm"><thead><tr><th>Danh mục ID</th><th>Sản phẩm ID</th><th>Loại</th></tr></thead><tbody>
+@foreach (var s in scopes) { <tr><td>@s.CategoryId</td><td>@s.ProductId</td><td>@(s.IsExclude ? "Loại trừ" : "Bao gồm")</td></tr> }
+@if (!scopes.Any()) { <tr><td colspan="3" class="text-muted">Toàn bộ sản phẩm</td></tr> }
+</tbody></table>
+<h2 class="h5 mt-4">Lịch sử sử dụng</h2>
+<div class="table-responsive"><table class="table table-striped">
+<thead><tr><th>Người dùng (ID)</th><th>Mã đơn</th><th>Trạng thái</th><th>Ngày</th><th class="text-end">Tiền giảm</th></tr></thead><tbody>
+@foreach (var u in usages) {
+<tr><td>@u.UserId</td><td>#@u.OrderId</td><td>@u.Status</td>
+<td>@u.CreatedAt.ToString("dd/MM/yyyy HH:mm")</td><td class="text-end">@u.DiscountAmount.ToString("N0",vi)đ</td></tr>
+}
+@if (!usages.Any()) { <tr><td colspan="5" class="text-center text-muted">Chưa phát sinh lượt sử dụng</td></tr> }
+</tbody></table></div>
