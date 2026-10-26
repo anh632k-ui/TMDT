@@ -38,8 +38,10 @@
     <form asp-action="ChangeStatus" asp-route-id="@Model.Id" method="post" class="d-flex gap-2">
         @Html.AntiForgeryToken()
         <select class="form-select" name="status" aria-label="Trạng thái mới">
-            @if (Model.Status == OrderStatus.Pending) {
-                <option value="Paid">Paid (đã thanh toán)</option>
+            @if (Model.Status == OrderStatus.Pending && Model.PaymentMethod == "COD") {
+                <option value="Shipping">Shipping (đang giao – COD)</option>
+            } else if (Model.Status == OrderStatus.Pending) {
+                <option value="Paid">Paid (đã thanh toán trực tuyến)</option>
             } else if (Model.Status == OrderStatus.Paid) {
                 <option value="Shipping">Shipping (đang giao)</option>
             } else {
@@ -49,7 +51,7 @@
         <button class="btn btn-primary">Cập nhật trạng thái</button>
     </form>
 }
-@if (Model.Status != OrderStatus.Completed && Model.Status != OrderStatus.Cancelled) {
+@if (Model.Status == OrderStatus.Pending || Model.Status == OrderStatus.Paid) {
     <form asp-action="Cancel" asp-route-id="@Model.Id" method="post" onsubmit="return confirm('Bạn muốn hủy đơn này?')">
         @Html.AntiForgeryToken()
         <button class="btn btn-outline-danger">Hủy đơn</button>
