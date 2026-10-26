@@ -35,7 +35,13 @@ public sealed class PaymentController : Controller
             return RedirectToAction("Details", "Orders", new { id });
         }
         // TV3 phải bảo đảm MarkPaidAsync chỉ xử lý một lần, cập nhật voucher trong transaction.
-        await _orders.MarkPaidAsync(id);
+        try {
+            await _orders.MarkPaidAsync(id);
+        } catch (InvalidOperationException ex) {
+            // TV3 từ chối trạng thái không hợp lệ / giao dịch không còn Pending.
+            TempData["Error"] = ex.Message;
+            return RedirectToAction("Details", "Orders", new { id });
+        }
         TempData["Success"] = "Thanh toán mô phỏng thành công";
         return RedirectToAction("Success", "Orders", new { id });
     }
