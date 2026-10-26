@@ -110,20 +110,30 @@ class Tv4StaticChecks(unittest.TestCase):
         self.assertIn('FindByEmailAsync(adminEmail)', s)
         self.assertIn('IsInRoleAsync(admin, "Admin")', s)
         self.assertIn('CategoryId = cats["Giấy"]', s)
+        self.assertIn('("Sổ tay bìa cứng A5 (bản giới hạn)","Sổ tay",65000,1)', s)
 
     def test_test_case_matrix_complete_and_unclaimed(self):
         with (ROOT / "docs/TV4/TEST_CASES.csv").open(encoding="utf-8-sig", newline="") as f:
             rows = list(csv.DictReader(f))
-        self.assertEqual(len(rows), 20)
-        self.assertEqual([int(r["STT"]) for r in rows], list(range(1, 21)))
+        self.assertEqual(len(rows), 23)
+        self.assertEqual([int(r["STT"]) for r in rows], list(range(1, 24)))
         self.assertTrue(all(r["Nhóm"] == "Voucher" for r in rows[:14]))
-        self.assertTrue(all(r["Nhóm"] == "Hệ thống" for r in rows[14:]))
+        self.assertEqual([r["Nhóm"] for r in rows[14:17]], ["Tồn kho", "Bảo mật", "Tồn kho"])
+        self.assertTrue(all(r["Nhóm"] == "Hệ thống" for r in rows[17:]))
         # Khi có kết quả kiểm thử thật, CI vẫn phải cho phép cập nhật bảng.
         statuses = {"Chưa chạy", "Đạt", "Không đạt", "PASS", "FAIL"}
         for row in rows:
             self.assertIn(row["Trạng thái"], statuses)
             if row["Trạng thái"] in {"Đạt", "Không đạt", "PASS", "FAIL"}:
                 self.assertTrue(row["Kết quả thực tế"].strip(), f"Thiếu bằng chứng TC{row['STT']}")
+
+    def test_tv3_integration_contract(self):
+        payment = (APP / "Controllers/PaymentController.cs").read_text("utf-8")
+        details = (APP / "Areas/Admin/Views/Orders/Details.cshtml").read_text("utf-8")
+        self.assertIn("catch (InvalidOperationException ex)", payment)
+        self.assertIn('Model.PaymentMethod == "COD"', details)
+        self.assertIn('value="Shipping"', details)
+        self.assertIn('value="Paid"', details)
 
     def test_no_accidental_razor_page_directive(self):
         for view in (APP / "Areas/Admin/Views").rglob("*.cshtml"):
