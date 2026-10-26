@@ -36,6 +36,13 @@ public static class DbSeeder
             if (!assigned.Succeeded) throw new InvalidOperationException("Không gán được role Admin");
         }
 
+        // CustomerUserManager của TV3 tự gán Customer lúc tạo tài khoản.
+        // Tài khoản demo dành riêng cho quản trị nên chỉ giữ vai trò Admin.
+        if (await users.IsInRoleAsync(admin, "Customer")) {
+            var removed = await users.RemoveFromRoleAsync(admin, "Customer");
+            if (!removed.Succeeded) throw new InvalidOperationException("Không thể tách role Customer khỏi Admin");
+        }
+
         var catNames = new[] { "Giấy", "Bút viết", "Sổ tay", "Dụng cụ văn phòng" };
         var slugs = new[] { "giay", "but-viet", "so-tay", "dung-cu-van-phong" };
         for (var i = 0; i < catNames.Length; i++)
@@ -59,6 +66,7 @@ public static class DbSeeder
             ("Bút dạ quang 5 màu","Bút viết",39000,130),
             ("Bút xóa nước","Bút viết",17000,90),
             ("Sổ tay A5 bìa cứng","Sổ tay",45000,100),
+            ("Sổ tay bìa cứng A5 (bản giới hạn)","Sổ tay",65000,1),
             ("Sổ lò xo A4 200 trang","Sổ tay",58000,110),
             ("Sổ ghi chép B5 120 trang","Sổ tay",32000,170),
             ("Sổ kế hoạch tuần","Sổ tay",49000,85),
