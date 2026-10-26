@@ -20,11 +20,13 @@ Bản ZIP đã có `VanPhongPham.csproj` .NET 8, Model, DbContext, migrations, `
 
 1. Clone repo nhóm bằng tài khoản có quyền. Tại **gốc repo nhóm** (chứa thư mục `VanPhongPham/`), giữ working tree sạch.
 2. Trên repo nhóm, tạo nhánh `tv4-quantri` từ `upload` bằng `git switch -c tv4-quantri upload` (nếu đã có nhánh TV4 trong repo nhóm, chuyển sang nhánh ấy).
-3. Tải file `scripts/merge-tv4-into-group.ps1` từ repo TMDT, chạy trên PowerShell:
+3. Tải script vào **thư mục tạm ngoài repository** (script kiểm tra `git status` sạch) rồi chạy PowerShell tại gốc repo nhóm:
 
 ```powershell
-# Đang ở gốc repository nhóm
-powershell -ExecutionPolicy Bypass -File .\merge-tv4-into-group.ps1 -RepoRoot .
+# Đang ở gốc repository nhóm (có thư mục VanPhongPham/)
+$script = Join-Path $env:TEMP "merge-tv4-into-group.ps1"
+Invoke-WebRequest "https://raw.githubusercontent.com/anh632k-ui/TMDT/tv4-quantri/scripts/merge-tv4-into-group.ps1" -OutFile $script
+powershell -ExecutionPolicy Bypass -File $script -RepoRoot .
 ```
 
 4. Script chỉ sao chép: `Areas/Admin`, `Controllers/PaymentController.cs`, `Views/Payment/Mock.cshtml`, `Data/DbSeeder.cs`, `wwwroot/images/products/placeholder.svg`. Nó **không copy** `Models`, `Services`, `Migrations`, `Program.cs`, các View khách. Hai file Payment hiện có của TV3 là bản mock tạm và sẽ được thay thế; script lưu backup các file ghi đè ở thư mục tạm và không tự commit.
