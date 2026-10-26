@@ -2,7 +2,7 @@
 
 ## Nguồn đã đối chiếu
 
-- Nhóm: `datvau0401-tech/VanPhongPham` (nhánh `upload`, bản ZIP người dùng cung cấp ngày 26/10/2026). Đây là **private repository**.
+- Nhóm: `datvau0401-tech/VanPhongPham` (**private repository**). ZIP đã đối chiếu là snapshot nhánh `upload` ngày 26/10/2026. Nhóm trưởng sau đó thông báo đã đưa khung dự án vào **`main`**. Nội dung `main` mới **chưa kiểm chứng trực tiếp** vì tài khoản GitHub kết nối chưa có quyền đọc repository private.
 - TV4: `anh632k-ui/TMDT`, nhánh `tv4-quantri` (repo công khai chứa phần TV4, kiểm thử riêng).
 - **Tuyệt đối không push mã TV3/TV2 từ repo private vào repo TMDT public.**
 
@@ -19,7 +19,15 @@ Bản ZIP đã có `VanPhongPham.csproj` .NET 8, Model, DbContext, migrations, `
 ## Cách đưa code TV4 vào repo nhóm mà không ảnh hưởng TV3
 
 1. Clone repo nhóm bằng tài khoản có quyền. Tại **gốc repo nhóm** (chứa thư mục `VanPhongPham/`), giữ working tree sạch.
-2. Trên repo nhóm, tạo nhánh `tv4-quantri` từ `upload` bằng `git switch -c tv4-quantri upload` (nếu đã có nhánh TV4 trong repo nhóm, chuyển sang nhánh ấy).
+2. Trên repo nhóm, cập nhật `main` sạch rồi tạo nhánh `tv4-quantri` **từ `main`** (không dùng nhánh `upload` cũ). Với repo vừa clone và chưa có nhánh TV4:
+
+```powershell
+git switch main
+git pull --ff-only origin main
+git switch -c tv4-quantri
+```
+
+Nếu nhánh TV4 của repo nhóm đã tồn tại, không tạo đè. Hãy kiểm tra `git branch -a`, chuyển đến nhánh hiện hữu và cập nhật `main` qua merge/PR theo thống nhất nhóm trước khi tiếp tục.
 3. Tải script vào **thư mục tạm ngoài repository** (script kiểm tra `git status` sạch) rồi chạy PowerShell tại gốc repo nhóm:
 
 ```powershell
@@ -30,7 +38,7 @@ powershell -ExecutionPolicy Bypass -File $script -RepoRoot .
 ```
 
 4. Script chỉ sao chép: `Areas/Admin`, `Controllers/PaymentController.cs`, `Views/Payment/Mock.cshtml`, `Data/DbSeeder.cs`, `wwwroot/images/products/placeholder.svg`. Nó **không copy** `Models`, `Services`, `Migrations`, `Program.cs`, các View khách. Hai file Payment hiện có của TV3 là bản mock tạm và sẽ được thay thế; script lưu backup các file ghi đè ở thư mục tạm và không tự commit.
-5. Kiểm tra `git diff --check`, `git diff --stat`, `git status` rồi mới commit trên nhánh TV4 **của repo nhóm**. Không đẩy trực tiếp main/upload nếu nhóm chưa thống nhất.
+5. Kiểm tra `git diff --check`, `git diff --stat`, `git status` rồi mới commit trên nhánh TV4 **của repo nhóm**. Không đẩy trực tiếp `main` hoặc nhánh `upload` cũ nếu nhóm chưa thống nhất.
 
 ## Việc TV3 phải thêm trong Program.cs
 
@@ -71,3 +79,7 @@ dotnet run --launch-profile http
 - `CustomerUserManager` tự gán role Customer cho người mới: seed TV4 sau khi gán Admin sẽ loại role Customer trên tài khoản quản trị mẫu.
 - ZIP có SQL thêm dữ liệu thử riêng; `DbSeeder` tự kiểm tra tên/mã tránh thêm trùng. Không chạy script DELETE/reset với dữ liệu cần giữ.
 - **Chưa chạy build tích hợp hoặc test SQL Server trong phiên này** vì máy chạy công cụ không có .NET SDK/SQL Server; chỉ CI của nhánh TV4 compile độc lập bằng contract stubs. Điều này không chứng minh backend thật tương thích hoàn toàn.
+
+## Cập nhật theo tin nhắn Zalo nhóm trưởng (26/10/2026)
+
+TV3 thông báo đã gộp khung dự án vào nhánh `main` của repository nhóm và yêu cầu TV4 clone/pull main, chạy README và tạo nhánh `tv4-quantri`. Trước khi ghép mã nguồn, cần **kiểm chứng nội dung main mới** bằng `git log -1 --oneline`, `git ls-files VanPhongPham` và `dotnet build VanPhongPham/VanPhongPham.csproj` trên máy có quyền truy cập. Những bước và kết quả này **chưa thể xác nhận qua kết nối GitHub hiện tại**; không được đánh dấu DONE tích hợp từ riêng ảnh chụp Zalo.
