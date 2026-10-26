@@ -13,9 +13,12 @@ STT,Nhóm,Tình huống,Chuẩn bị/Các bước,Kết quả mong đợi,Kết 
 12,Voucher,Giỏ đổi sau khi áp mã,"Áp VPP50; giảm giỏ dưới 150000đ","Voucher tự gỡ; hiện lý do; tổng cập nhật",,Chưa chạy,TV3
 13,Voucher,Hủy đơn hoàn lượt,"Đặt đơn với VPP50; hủy đơn","VoucherUsage Released; UsedCount giảm đúng 1",,Chưa chạy,TV3
 14,Voucher,Tranh lượt cuối,"Hai tài khoản bấm đặt với LUOTCUOI gần đồng thời","Chỉ một đơn dùng mã thành công; đơn khác báo hết lượt",,Chưa chạy,TV3
-15,Hệ thống,Đăng nhập và phân quyền,"Customer đăng nhập rồi mở /Admin","Bị từ chối truy cập",,Chưa chạy,TV3
-16,Hệ thống,Quản trị sản phẩm,"Admin tạo sửa và ẩn sản phẩm có ảnh","Hiển thị đúng; ảnh lưu; sản phẩm ẩn khỏi phía khách",,Chưa chạy,TV4
-17,Hệ thống,Giỏ hàng và tồn kho,"Cho số lượng đặt vượt tồn kho","Server từ chối tạo đơn",,Chưa chạy,TV3
-18,Hệ thống,Đặt hàng giỏ rỗng,"Vào Checkout khi giỏ không có sản phẩm","Không tạo đơn rỗng",,Chưa chạy,TV3
-19,Hệ thống,Thanh toán mô phỏng,"Tạo đơn Online rồi thử Success và Cancel","Đơn đổi trạng thái theo IOrderService; không thu tiền thật",,Chưa chạy,TV4
-20,Hệ thống,Giao diện điện thoại,"Mở trang ở chế độ mobile F12","Không vỡ bố cục; nút dùng được",,Chưa chạy,TV2
+15,Tồn kho,Giành sản phẩm cuối,"Sổ tay bìa cứng A5 (bản giới hạn) Stock=1; 2 tài khoản đặt gần cùng lúc","Chỉ một đơn thành công; đơn kia báo không còn đủ hàng; tồn kho = 0, không âm",,Chưa chạy,TV3
+16,Bảo mật,Sửa giá từ trình duyệt,"Mở F12 sửa trường giá/tổng tiền ở Checkout rồi đặt hàng","Order vẫn dùng giá sản phẩm từ CSDL; không tin dữ liệu tiền từ trình duyệt",,Chưa chạy,TV3
+17,Tồn kho,Hủy đơn hoàn tồn kho,"Đặt thành công số lượng 2 của một sản phẩm rồi hủy đơn","Stock tăng lại đúng 2, không hoàn lại lần hai khi hủy lặp",,Chưa chạy,TV3
+18,Hệ thống,Đăng nhập và phân quyền,"Customer đăng nhập rồi mở /Admin","Bị từ chối truy cập",,Chưa chạy,TV3
+19,Hệ thống,Quản trị sản phẩm,"Admin tạo sửa và ẩn sản phẩm có ảnh","Hiển thị đúng; ảnh lưu; sản phẩm ẩn khỏi phía khách",,Chưa chạy,TV4
+20,Hệ thống,Giỏ hàng và tồn kho,"Cho số lượng đặt vượt tồn kho","Server từ chối tạo đơn",,Chưa chạy,TV3
+21,Hệ thống,Đặt hàng giỏ rỗng,"Vào Checkout khi giỏ không có sản phẩm","Không tạo đơn rỗng",,Chưa chạy,TV3
+22,Hệ thống,Thanh toán mô phỏng,"Tạo đơn Online rồi thử Success và Cancel","Đơn đổi trạng thái theo IOrderService; không thu tiền thật",,Chưa chạy,TV4
+23,Hệ thống,Giao diện điện thoại,"Mở trang ở chế độ mobile F12","Không vỡ bố cục; nút dùng được",,Chưa chạy,TV2
