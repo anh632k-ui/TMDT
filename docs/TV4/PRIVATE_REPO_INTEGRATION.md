@@ -83,3 +83,13 @@ dotnet run --launch-profile http
 ## Cập nhật theo tin nhắn Zalo nhóm trưởng (26/10/2026)
 
 TV3 thông báo đã gộp khung dự án vào nhánh `main` của repository nhóm và yêu cầu TV4 clone/pull main, chạy README và tạo nhánh `tv4-quantri`. Trước khi ghép mã nguồn, cần **kiểm chứng nội dung main mới** bằng `git log -1 --oneline`, `git ls-files VanPhongPham` và `dotnet build VanPhongPham/VanPhongPham.csproj` trên máy có quyền truy cập. Những bước và kết quả này **chưa thể xác nhận qua kết nối GitHub hiện tại**; không được đánh dấu DONE tích hợp từ riêng ảnh chụp Zalo.
+
+## Kiểm chứng thêm từ ZIP main (26/10/2026)
+
+Bản `VanPhongPham-main.zip` đã nhận có project `.NET 8`, 7 DbSet, migrations, `AddRoles<IdentityRole>()`, route Area và `IOrderService` phù hợp, nên có thể dùng làm nền ghép TV4. So với ZIP `upload` trước đó, **danh sách 113 file giống nhau**, có thay đổi nội dung 6 file, nổi bật là `OrderService.cs` và `DuLieuThuVoucher.sql` để hỗ trợ tình huống tranh sản phẩm cuối.
+
+**Hai việc nhờ TV3 rà lại:**
+1. `Program.cs` trong ZIP main vẫn chưa gọi `DbSeeder.SeedAsync` — khi ghép TV4, tài khoản Admin và dữ liệu demo không thể tự xuất hiện nếu không thêm lời gọi.
+2. README trong ZIP main còn hướng dẫn tải nhánh `upload` và chạy `dotnet tool restore`, nhưng ZIP không có `.config/dotnet-tools.json` (local tool manifest). Có thể cài `dotnet-ef` toàn cục khi cần, hoặc TV3 thêm manifest và cập nhật README cho đúng nhánh `main`.
+
+**Chưa chạy được `dotnet build` với source chính / SQL Server trong phiên kiểm tra ZIP:** môi trường đọc ZIP không có .NET SDK. Kết quả CI PASS của repo TMDT vẫn chỉ là *biên dịch TV4 độc lập với contract stubs*; lần chạy tích hợp phải thực hiện trên máy thành viên có SQL Server và ứng dụng hoàn chỉnh.
