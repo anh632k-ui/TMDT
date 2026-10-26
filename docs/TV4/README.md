@@ -8,14 +8,14 @@ Thực hiện đúng phần việc TV4 của đồ án **Website bán văn phòn
 - `VanPhongPham/Areas/Admin/ViewModels`: form nhập sản phẩm, voucher.
 - `VanPhongPham/Areas/Admin/Views`: layout, dashboard, CRUD sản phẩm, đơn hàng, voucher và thống kê lượt dùng.
 - `VanPhongPham/Controllers/PaymentController.cs` và `VanPhongPham/Views/Payment/Mock.cshtml`: thanh toán trực tuyến **GIẢ LẬP**.
-- `VanPhongPham/Data/DbSeeder.cs`: Admin demo, 4 danh mục, 24 sản phẩm, 9 mã voucher.
-- `docs/TV4/TEST_CASES.csv`: 14 ca voucher + 6 ca hệ thống (kết quả thực tế để trống đến khi chạy).
-- `docs/TV4/DEMO.md`: demo 5 phút, kiểm tra tích hợp.
+- `VanPhongPham/Data/DbSeeder.cs`: Admin demo, 4 danh mục, 25 sản phẩm (gồm sổ A5 giới hạn Stock = 1), 9 mã voucher.
+- `docs/TV4/TEST_CASES.csv`: 17 tình huống chính (14 voucher + 3 tồn kho/bảo mật) và 6 kiểm thử hệ thống (kết quả thực tế để trống đến khi chạy).
+- `docs/TV4/DEMO.md`: demo 2 phút trong phần thuyết trình tối đa 5 phút, kiểm tra tích hợp.
 
 ## Trạng thái hiện tại
 
 **Hoàn tất mã nguồn phần TV4 theo hợp đồng tài liệu. Chưa tích hợp/chưa chạy thực tế.**
-Repository ban đầu chỉ có README; chưa có .csproj, Models, DbContext, Services và View phía khách do TV2/TV3 phụ trách.
+Repo TMDT của cá nhân chỉ chứa phần TV4. Đã nhận bản ZIP source TV3/TV2 ở repo private `datvau0401-tech/VanPhongPham` (nhánh `upload`, 26/10/2026): có .csproj, Models, DbContext, migrations, Services và giao diện khách cơ bản. Chưa ghép vào repo private hoặc chạy website thật.
 Không được ghi ĐẠT cho bất kỳ ca kiểm thử nào khi chưa chạy.
 
 ## Những gì cần TV3 cung cấp
@@ -81,3 +81,11 @@ Kiểm tra: `/Admin`, `/Admin/Products`, `/Admin/Orders`, `/Admin/Vouchers`, `/P
 - Bộ dữ liệu seed tự tránh thêm trùng dựa trên tên/mã, phục vụ demo, không thay thế hệ thống import dữ liệu sản phẩm.
 - Các giá trị mã `HETHAN`, `SAPTOI`, `LUOTCUOI` phụ thuộc thời gian và trạng thái kiểm thử. Khi chạy lại demo, reset môi trường test có kiểm soát nếu các ca đã làm thay đổi số lượt.
 - Sau khi TV3 làm xong, chạy `dotnet build`, kiểm tra toàn bộ use case, ghi kết quả thực tế trong bảng test, chụp bằng chứng, quay demo và backup database.
+
+## Làm việc với repository private của nhóm (đã đối chiếu ZIP 26/10/2026)
+
+- **Nguồn nhóm:** `datvau0401-tech/VanPhongPham` (private, nhánh `upload` theo ảnh). Nhóm giữ quyền sở hữu mọi Models/Services/migrations.
+- **Nguồn TV4:** `anh632k-ui/TMDT`, nhánh `tv4-quantri` (public, chỉ chứa TV4).
+- **Không đẩy bản ZIP riêng tư TV3 lên public TMDT**. Để đưa code TV4 vào repo nhóm, dùng `scripts/merge-tv4-into-group.ps1` theo hướng dẫn ở `docs/TV4/PRIVATE_REPO_INTEGRATION.md` trên bản sao sạch của repo nhóm.
+- Bản zip TV3 có database và `IOrderService` phù hợp chữ ký trong tài liệu; luồng thanh toán Online chuyển đến Mock. Bản TV4 đã chỉnh COD/Online UI và xử lý lỗi `MarkPaidAsync` theo code thật.
+- **Chưa thể gọi là DONE khi chưa chạy thử thực tế** 17 tình huống chính, phân quyền, seed và checkout trên SQL Server.
