@@ -9,13 +9,13 @@ Thực hiện đúng phần việc TV4 của đồ án **Website bán văn phòn
 - `VanPhongPham/Areas/Admin/Views`: layout, dashboard, CRUD sản phẩm, đơn hàng, voucher và thống kê lượt dùng.
 - `VanPhongPham/Controllers/PaymentController.cs` và `VanPhongPham/Views/Payment/Mock.cshtml`: thanh toán trực tuyến **GIẢ LẬP**.
 - `VanPhongPham/Data/DbSeeder.cs`: Admin demo, 4 danh mục, 25 sản phẩm (gồm sổ A5 giới hạn Stock = 1), 9 mã voucher.
-- `docs/TV4/TEST_CASES.csv`: 17 tình huống chính (14 voucher + 3 tồn kho/bảo mật) và 6 kiểm thử hệ thống (kết quả thực tế để trống đến khi chạy).
+- `docs/TV4/TEST_CASES.csv`: 20 tình huống chính thức theo hướng dẫn mới ngày 27/10/2026 (kết quả thực tế để trống đến khi chạy).
 - `docs/TV4/DEMO.md`: demo 2 phút trong phần thuyết trình tối đa 5 phút, kiểm tra tích hợp.
 
 ## Trạng thái hiện tại
 
 **Hoàn tất mã nguồn phần TV4 theo hợp đồng tài liệu. Chưa tích hợp/chưa chạy thực tế.**
-Repo TMDT của cá nhân chỉ chứa phần TV4. Đã nhận bản ZIP source TV3/TV2 ở repo private `datvau0401-tech/VanPhongPham` (nhánh `upload`, 26/10/2026): có .csproj, Models, DbContext, migrations, Services và giao diện khách cơ bản. Chưa ghép vào repo private hoặc chạy website thật.
+Repo TMDT của cá nhân chỉ chứa phần TV4. Đã nhận bản ZIP source TV3/TV2 ở repo private `datvau0401-tech/VanPhongPham` (nhánh `upload`, 26/10/2026): có .csproj, Models, DbContext, migrations, Services và giao diện khách cơ bản. Đã ghép vào bản dự án nhóm trên máy và người dùng đã xác nhận build, truy cập Admin thành công; kết quả 20 ca kiểm thử, bản sao lưu và video vẫn chưa được xác nhận.
 Không được ghi ĐẠT cho bất kỳ ca kiểm thử nào khi chưa chạy.
 
 ## Những gì cần TV3 cung cấp
@@ -88,4 +88,17 @@ Kiểm tra: `/Admin`, `/Admin/Products`, `/Admin/Orders`, `/Admin/Vouchers`, `/P
 - **Nguồn TV4:** `anh632k-ui/TMDT`, nhánh `tv4-quantri` (public, chỉ chứa TV4).
 - **Không đẩy bản ZIP riêng tư TV3 lên public TMDT**. Để đưa code TV4 vào repo nhóm, dùng `scripts/merge-tv4-into-group.ps1` theo hướng dẫn ở `docs/TV4/PRIVATE_REPO_INTEGRATION.md` trên bản sao sạch của repo nhóm.
 - Bản zip TV3 có database và `IOrderService` phù hợp chữ ký trong tài liệu; luồng thanh toán Online chuyển đến Mock. Bản TV4 đã chỉnh COD/Online UI và xử lý lỗi `MarkPaidAsync` theo code thật.
-- **Chưa thể gọi là DONE khi chưa chạy thử thực tế** 17 tình huống chính, phân quyền, seed và checkout trên SQL Server.
+- **Chưa thể gọi là DONE khi chưa chạy thử thực tế** 20 tình huống chính thức, phân quyền, seed và checkout trên SQL Server.
+
+## Cập nhật công việc TV4 ngày 27/10/2026
+
+Theo tài liệu mới `HuongDan_Anh_Admin_KiemThu_Demo`, phạm vi bàn giao gồm:
+
+1. Xóa chú thích nội bộ khỏi chi tiết đơn Admin; kiểm tra các View khác không có TODO/TV2/TV3/TV4 hiển thị.
+2. Nhận script reset an toàn từ Hậu, dọn đơn test trên database DEMO và khôi phục Stock/voucher đúng trạng thái. **Chưa thực hiện từ GitHub**.
+3. `docs/TV4/TEST_CASES.csv` gồm **20 tình huống đúng nguyên bảng mới**, tám cột chuẩn. Kết quả thực tế chưa được giả lập.
+4. `docs/TV4/DEMO.md`: A tranh sản phẩm cuối, B tranh LUOTCUOI, **C chống đặt đơn trùng hai tab**; mỗi kịch bản tập hai lần.
+5. `docs/TV4/BACKUP_AND_VIDEO.md`: checklist sao lưu .bak, xác minh bản sao lưu, quay video .mp4 trên máy demo; **chưa có file .bak/.mp4 thực tế**.
+6. `docs/TV4/EVIDENCE_INDEX.md`: danh mục ảnh để dán vào Word kiểm thử và gửi Đạt.
+
+Hạn bảng kiểm thử: **28/10 15:00**; demo/PR: **28/10 18:00**; backup và video: tối 28/10. Phần Git nhóm do người dùng tự đảm nhiệm, không push hay merge hộ.
