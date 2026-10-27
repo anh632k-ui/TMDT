@@ -1,35 +1,45 @@
-# TV4 – Kịch bản demo 2 phút (bài thuyết trình tối đa 5 phút)
+# TV4 – Kịch bản demo A/B/C (khoảng 2 phút)
 
-**Đúng tài liệu TV4 cập nhật 26/10/2026:** phần demo minh họa **3 quyết định thiết kế** thay vì chỉ giới thiệu tính năng chung. Hai trình duyệt: một thông thường, một ẩn danh; hai tài khoản Customer đã đăng nhập.
+**Theo Hướng dẫn công việc: Anh (Admin, kiểm thử, demo), cập nhật 27/10/2026.** Demo minh họa ba quyết định xử lý hệ thống được nêu trong slide 8. Kết quả ở dưới là **kỳ vọng**, chưa phải kết quả kiểm chứng.
 
-## Kịch bản 0:00–2:00
+## Trước khi diễn tập
 
-| Mốc | Demo | Điều giảng viên cần thấy |
+- Phối hợp Hậu (TV3) lấy **script reset dành riêng database demo**, kiểm tra dữ liệu đích, sao lưu .bak trước khi dùng. Không chạy script xóa đơn trên dữ liệu cần giữ.
+- Chuẩn bị hai phiên trình duyệt khác nhau, đăng nhập **hai Customer khác nhau**. Mở sẵn trang Thanh toán, nhập sẵn địa chỉ/tên/số điện thoại.
+- Mở thêm Admin: Sản phẩm, Voucher và Đơn hàng. Giữ website chạy trên cùng máy.
+- Với Demo A: sản phẩm `Sổ tay bìa cứng A5 (bản giới hạn)` có `Stock=1`. Với Demo B: voucher `LUOTCUOI` có `UsedCount=0`, `TotalLimit=1` và sản phẩm dùng trong giỏ **còn đủ hàng**.
+- Demo C yêu cầu cơ chế chống đặt trùng từ TV3 (request key được xử lý một lần). Nếu chưa kiểm chứng, dừng và báo Hậu thay vì trình bày là đã đạt.
+
+## Kịch bản tối đa 2 phút
+
+| Thời điểm | Demo | Kết quả cần chứng minh |
 | --- | --- | --- |
-| 0:00–0:40 | **A – Tranh sản phẩm cuối:** 2 khách cùng có **Sổ tay bìa cứng A5 (bản giới hạn)** (Stock = 1) trong giỏ và ở Checkout. Bấm Đặt hàng gần đồng thời. | **Chỉ một đơn thành công**; đơn kia bị từ chối, tồn kho bằng 0 và không âm. Quyết định 1: `ExecuteUpdateAsync` có điều kiện `Stock >= Quantity`. |
-| 0:40–1:20 | **B – Tranh lượt voucher cuối:** 2 khách khác nhau đã chuẩn bị giỏ, cùng áp `LUOTCUOI` (TotalLimit = 1, UsedCount = 0) và bấm Đặt hàng gần đồng thời. | **Chỉ một đơn dùng mã thành công**, đơn kia báo vừa hết lượt. Quyết định 2: cập nhật lượt nguyên tử trong transaction. |
-| 1:20–2:00 | **C – Hoàn tồn kho, voucher:** hủy một đơn đang cho phép hủy, rồi mở Admin → Đơn hàng/Voucher/Sản phẩm. | `VoucherUsage` chuyển `Released`; `UsedCount` giảm theo quy tắc; `Product.Stock` tăng lại đúng số lượng. Quyết định 5. |
+| 00:00–00:40 | **A – Không bán vượt kho.** Hai Customer đã mở Checkout với sản phẩm chỉ còn 1. Đếm 3–2–1 rồi gần đồng thời bấm Đặt hàng; chuyển Admin > Sản phẩm. | Một đơn thành công; khách còn lại nhận lỗi hết hàng; tồn kho **0**, không âm. |
+| 00:40–01:20 | **B – Không vượt lượt voucher.** Dùng hai giỏ hàng còn đủ tồn kho, mỗi khách áp `LUOTCUOI` còn 1 lượt và đặt gần đồng thời; chuyển Admin > Voucher. | Một đơn sử dụng mã thành công, người còn lại nhận lỗi vừa hết lượt; `LUOTCUOI: 1/1`. |
+| 01:20–02:00 | **C – Không đặt đơn trùng.** Một tài khoản mở cùng Checkout trên **hai tab**, bấm Đặt hàng tab 1 rồi ngay sau đó tab 2; chuyển Admin > Đơn hàng. | Chỉ **một đơn mới**, tồn kho chỉ trừ một lần. |
 
-## Trước khi demo
+## Nếu còn thời gian: minh họa hoàn trả (quyết định 4)
 
-1. Trên **cơ sở dữ liệu chỉ dành cho demo**: sản phẩm bản giới hạn Stock = 1, voucher `LUOTCUOI` còn đúng 1 lượt. Không reset bảng, xóa đơn hàng hoặc chạy SQL dọn dữ liệu trên CSDL thật hoặc máy đang chứa dữ liệu cần giữ.
-2. Mở sẵn hai trình duyệt / phiên riêng cho khách; tab Admin đã đăng nhập; chuẩn bị đủ các giỏ hàng.
-3. Tập ít nhất hai lần; quay video dự phòng và sao lưu `.bak` trước lúc reset thử nghiệm.
-4. Một lần thử sử dụng hết hàng/mã sẽ thay đổi trạng thái. Giữa các lần tập, khôi phục **bản sao dữ liệu demo sạch** đã sao lưu hoặc yêu cầu TV3 cấp tiện ích reset phục vụ kiểm thử.
+Admin > Đơn hàng > Chi tiết một đơn còn được phép hủy và có voucher `LUOTCUOI`, chọn Hủy đơn. Kiểm tra `UsedCount` giảm về 0/1, Stock tăng lại đúng số đã trừ. Không hủy đơn đã hoàn tất; không hủy các đơn có dữ liệu cần giữ.
 
-## Các kiểm thử bổ sung không nhất thiết trình diễn trực tiếp
+## Phiếu diễn tập 2 lần
 
-- **TC16 – Sửa giá/tổng tiền bằng F12:** đặt hàng sau khi thay thông số trong form; đơn phải tính lại theo giá lưu trong CSDL. Quyết định thiết kế số 4.
-- **TC17 – Hủy đơn hoàn tồn kho:** đặt số lượng 2, hủy và xác nhận stock tăng đúng 2 (không tăng hai lần).
-- Toàn bộ 17 tình huống chính phải được ghi **Kết quả thực tế** trong `TEST_CASES.csv` khi có môi trường chạy.
+| Demo | Lần 1 – kết quả thật | Lần 2 – kết quả thật | Ảnh/video |
+| --- | --- | --- | --- |
+| A: Tranh Stock cuối | Chưa chạy | Chưa chạy | Chưa có |
+| B: Tranh LUOTCUOI | Chưa chạy | Chưa chạy | Chưa có |
+| C: Chống đặt trùng | Chưa chạy | Chưa chạy | Chưa có |
+| D: Hoàn trả (tùy chọn) | Chưa chạy | Chưa chạy | Chưa có |
 
-## Nếu giảng viên hỏi
+**Nếu FAIL:** chụp lỗi và ghi các bước tái hiện; lỗi giao diện khách chuyển Giang, lỗi `OrderService`/voucher/transaction chuyển Hậu, lỗi trang Admin do Anh sửa. Chỉ đánh dấu ĐẠT sau khi chạy lại thành công.
 
-- **Tại sao hai khách không thể mua cùng một sản phẩm cuối?** Vì lệnh cập nhật tồn kho có điều kiện `Stock >= Quantity` chạy trong transaction; số dòng cập nhật = 0 thì từ chối đặt hàng.
-- **Tại sao không bán quá lượt voucher?** Vì tăng `UsedCount` có điều kiện và giao dịch, không chỉ kiểm tra ở giao diện.
-- **Vì sao hủy đơn phải hoàn cả tồn kho và voucher?** Bởi đơn đã giữ/trừ các tài nguyên khi tạo; hủy cần khôi phục theo `IOrderService`, tránh để tài nguyên bị chiếm vô thời hạn.
-- **Ai làm các thành phần?** TV3 viết xử lý nguyên tử và rollback; TV4 làm Admin, dữ liệu demo, thanh toán giả lập, kiểm thử và thao tác demo; TV2 làm giao diện khách.
+## Chụp và gửi Đạt
 
-## Bằng chứng cần bàn giao TV1
+Ưu tiên 6–10 ảnh: hai kết quả tranh stock, Admin kho = 0, hai kết quả tranh voucher, Admin LUOTCUOI = 1/1, Admin chỉ 1 đơn khi đặt trùng, Admin sau hủy (tùy chọn). Giữ ảnh và bảng test trong `docs/TV4` ở repo nhóm **sau khi mày tự ghép**; không để ảnh chưa thử làm bằng chứng đã đạt.
 
-Ảnh dashboard Admin, CRUD sản phẩm/voucher, lịch sử dùng voucher, màn hình thanh toán mô phỏng, hai kết quả thành công/thất bại khi tranh hàng và tranh voucher, kiểm tra tồn kho và lượt dùng sau hủy; bảng test có kết quả thực tế.
+## Mốc và bàn giao
+
+- **28/10 15:00:** bảng kiểm thử tối thiểu 15 ca đã có kết quả thực tế.
+- **28/10 18:00:** tập trọn A/B/C hai lượt và gửi Đạt minh chứng.
+- **28/10 tối:** lưu và mở thử bản backup `.bak` và video `.mp4` (không đưa binary này lên GitHub).
+- **29/10 sáng:** tập thuyết trình hai lần có bấm giờ; chỉ sửa lỗi nghiêm trọng, không thêm chức năng mới.

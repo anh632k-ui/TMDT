@@ -1,24 +1,21 @@
-STT,Nhóm,Tình huống,Chuẩn bị/Các bước,Kết quả mong đợi,Kết quả thực tế,Trạng thái,Người sửa
-1,Voucher,Mã hợp lệ,"Giỏ 205000đ; ship 22000đ; áp VPP50","Giảm 20500đ; tổng 206500đ",,Chưa chạy,TV3
-2,Voucher,Mã không tồn tại,"Áp ABC123","Mã không tồn tại hoặc đã hết hạn; tiền không đổi",,Chưa chạy,TV3
-3,Voucher,Mã hết hạn,"Áp HETHAN","Mã không tồn tại hoặc đã hết hạn",,Chưa chạy,TV3
-4,Voucher,Chưa đến ngày,"Áp SAPTOI","Mã chưa tới ngày áp dụng",,Chưa chạy,TV3
-5,Voucher,Thiếu đơn tối thiểu,"Giỏ 100000đ; áp VPP50","Mua thêm 50000đ để dùng mã này",,Chưa chạy,TV3
-6,Voucher,Trần giảm tối đa,"Giỏ 1000000đ; áp VPP50","Giảm tối đa 50000đ",,Chưa chạy,TV3
-7,Voucher,Hết tổng lượt,"Áp HETLUOT","Mã đã hết lượt sử dụng",,Chưa chạy,TV3
-8,Voucher,Giới hạn mỗi người,"Tài khoản mới đặt 1 đơn dùng CHAOMUNG; thử lại","Bạn đã dùng tối đa số lần cho mã này",,Chưa chạy,TV3
-9,Voucher,Sai danh mục,"Giỏ chỉ có bút; áp GIAY10","Giỏ hàng không có sản phẩm thuộc danh mục áp dụng",,Chưa chạy,TV3
-10,Voucher,Cộng gộp được,"Giỏ từ 300000đ; áp VPP50 rồi FREESHIP","Áp cả hai; phí vận chuyển sau giảm = 0đ",,Chưa chạy,TV3
-11,Voucher,Thay mã cùng nhóm,"Áp VPP50 rồi GIAM20K","VPP50 được thay bởi GIAM20K và có thông báo",,Chưa chạy,TV3
-12,Voucher,Giỏ đổi sau khi áp mã,"Áp VPP50; giảm giỏ dưới 150000đ","Voucher tự gỡ; hiện lý do; tổng cập nhật",,Chưa chạy,TV3
-13,Voucher,Hủy đơn hoàn lượt,"Đặt đơn với VPP50; hủy đơn","VoucherUsage Released; UsedCount giảm đúng 1",,Chưa chạy,TV3
-14,Voucher,Tranh lượt cuối,"Hai tài khoản bấm đặt với LUOTCUOI gần đồng thời","Chỉ một đơn dùng mã thành công; đơn khác báo hết lượt",,Chưa chạy,TV3
-15,Tồn kho,Giành sản phẩm cuối,"Sổ tay bìa cứng A5 (bản giới hạn) Stock=1; 2 tài khoản đặt gần cùng lúc","Chỉ một đơn thành công; đơn kia báo không còn đủ hàng; tồn kho = 0, không âm",,Chưa chạy,TV3
-16,Bảo mật,Sửa giá từ trình duyệt,"Mở F12 sửa trường giá/tổng tiền ở Checkout rồi đặt hàng","Order vẫn dùng giá sản phẩm từ CSDL; không tin dữ liệu tiền từ trình duyệt",,Chưa chạy,TV3
-17,Tồn kho,Hủy đơn hoàn tồn kho,"Đặt thành công số lượng 2 của một sản phẩm rồi hủy đơn","Stock tăng lại đúng 2, không hoàn lại lần hai khi hủy lặp",,Chưa chạy,TV3
-18,Hệ thống,Đăng nhập và phân quyền,"Customer đăng nhập rồi mở /Admin","Bị từ chối truy cập",,Chưa chạy,TV3
-19,Hệ thống,Quản trị sản phẩm,"Admin tạo sửa và ẩn sản phẩm có ảnh","Hiển thị đúng; ảnh lưu; sản phẩm ẩn khỏi phía khách",,Chưa chạy,TV4
-20,Hệ thống,Giỏ hàng và tồn kho,"Cho số lượng đặt vượt tồn kho","Server từ chối tạo đơn",,Chưa chạy,TV3
-21,Hệ thống,Đặt hàng giỏ rỗng,"Vào Checkout khi giỏ không có sản phẩm","Không tạo đơn rỗng",,Chưa chạy,TV3
-22,Hệ thống,Thanh toán mô phỏng,"Tạo đơn Online rồi thử Success và Cancel","Đơn đổi trạng thái theo IOrderService; không thu tiền thật",,Chưa chạy,TV4
-23,Hệ thống,Giao diện điện thoại,"Mở trang ở chế độ mobile F12","Không vỡ bố cục; nút dùng được",,Chưa chạy,TV2
+﻿"STT","Tình huống","Chuẩn bị","Các bước","Kết quả mong đợi","Kết quả thực tế","Đạt/Không đạt","Người sửa"
+"1","Đăng ký, đăng nhập tài khoản khách","Chưa có tài khoản kiểm thử hoặc đã có tài khoản Customer","Vào Register tạo tài khoản, đăng nhập, quan sát thanh menu","Đăng nhập thành công; email hiển thị ở menu.","","Chưa chạy",""
+"2","Thêm vào giỏ khi chưa đăng nhập, rồi thanh toán","Phiên khách chưa đăng nhập, giỏ chưa có hàng","Thêm sản phẩm vào giỏ, chọn Thanh toán; đăng nhập khi được yêu cầu","Yêu cầu đăng nhập; giỏ vẫn còn sau khi đăng nhập.","","Chưa chạy",""
+"3","Thêm sản phẩm vượt tồn kho","Chọn sản phẩm còn ít hàng","Nhập số lượng lớn hơn Stock, nhấn thêm vào giỏ","Báo 'Số lượng vượt tồn kho'; không thêm vượt giới hạn.","","Chưa chạy",""
+"4","Đặt hàng khi giỏ trống","Tài khoản Customer đăng nhập, giỏ rỗng","Vào trang Checkout và thử đặt hàng","Báo giỏ trống; không tạo đơn.","","Chưa chạy",""
+"5","Áp VPP50 với giỏ mẫu","2 gói giấy A4 80.000đ và 1 hộp bút 45.000đ; ship 22.000đ","Mở Checkout và áp mã VPP50","Giảm 20.500đ; tổng 206.500đ.","","Chưa chạy",""
+"6","VPP50 khi chưa đạt đơn tối thiểu","Giỏ hàng thấp hơn 150.000đ","Áp VPP50 trên Checkout","Báo 'Mua thêm ...đ để dùng mã này'; tổng không đổi.","","Chưa chạy",""
+"7","Áp mã hết hạn HETHAN","Voucher HETHAN có ngày hết hạn trong quá khứ","Áp HETHAN tại Checkout","Báo 'Mã không tồn tại hoặc đã hết hạn'.","","Chưa chạy",""
+"8","Áp mã chưa tới ngày SAPTOI","Voucher SAPTOI chưa đến ngày bắt đầu","Áp SAPTOI tại Checkout","Báo 'Mã chưa tới ngày áp dụng'.","","Chưa chạy",""
+"9","Áp mã đã hết lượt HETLUOT","Voucher HETLUOT hết tổng lượt","Áp HETLUOT tại Checkout","Báo 'Mã đã hết lượt sử dụng'.","","Chưa chạy",""
+"10","Áp VPP50 và FREESHIP","Giỏ đủ điều kiện cả mã giảm hàng và vận chuyển","Áp VPP50 và FREESHIP ở Checkout","Cả hai mã được áp; tiền giảm và tổng tiền đúng.","","Chưa chạy",""
+"11","Áp hai mã giảm hàng","Giỏ đủ điều kiện hai mã giảm hàng","Áp mã thứ nhất rồi áp mã giảm hàng thứ hai","Mã sau thay mã trước, có thông báo.","","Chưa chạy",""
+"12","Hai khách cùng mua sản phẩm cuối","Stock sản phẩm demo = 1; 2 tài khoản/2 trình duyệt","Chuẩn bị Checkout cho cả hai, bấm Đặt hàng gần đồng thời","Một đơn thành công; một báo hết hàng; Stock = 0 và không âm.","","Chưa chạy",""
+"13","Hai khách cùng áp LUOTCUOI","Voucher LUOTCUOI UsedCount = 0 / TotalLimit = 1; 2 tài khoản","Mỗi khách áp LUOTCUOI và gần đồng thời đặt hàng","Một thành công; một báo 'Mã vừa hết lượt'; UsedCount = 1/1.","","Chưa chạy",""
+"14","Đặt hàng hai lần từ hai tab","Cùng một tài khoản mở hai tab Checkout cùng giỏ","Bấm Đặt hàng ở tab một rồi ngay sau đó ở tab hai","Chỉ có một đơn mới; Stock chỉ giảm một lần.","","Chưa chạy",""
+"15","Khách hủy đơn có voucher","Đơn đang cho phép hủy, đã dùng voucher","Ghi nhận Stock và UsedCount; hủy đơn; kiểm tra lại","Stock tăng lại; lượt voucher được hoàn đúng quy tắc.","","Chưa chạy",""
+"16","Admin chuyển Pending → Shipping → Completed","Đơn COD Pending hợp lệ; Admin đã đăng nhập","Mở chi tiết đơn, đổi qua Shipping rồi Completed; thử chuyển sai trạng thái","Trạng thái đổi đúng thứ tự; bước không hợp lệ bị từ chối.","","Chưa chạy",""
+"17","Admin hủy đơn","Đơn đang ở trạng thái cho phép hủy","Mở Admin > Đơn hàng > Chi tiết, chọn Hủy đơn, đối chiếu kho và voucher","Đơn hủy; Stock và lượt voucher được hoàn lại đúng một lần.","","Chưa chạy",""
+"18","Thanh toán Online mô phỏng","Đơn Online Pending của khách đăng nhập","Mở Payment/Mock, chọn Thanh toán thành công, kiểm tra chi tiết đơn","Đơn chuyển Paid; không phát sinh giao dịch tiền thật.","","Chưa chạy",""
+"19","Khách thường truy cập /Admin","Đã đăng nhập bằng tài khoản Customer không có role Admin","Gõ trực tiếp /Admin và /Admin/Products","Không xem được dữ liệu quản trị; bị chặn hoặc điều hướng từ chối.","","Chưa chạy",""
+"20","Giao diện trên điện thoại","Trang khách và Admin đã chạy; trình duyệt có chế độ F12 mobile","Bật Toggle device toolbar; kiểm tra các trang và thao tác chính","Không tràn ngang; nút bấm sử dụng được.","","Chưa chạy",""
