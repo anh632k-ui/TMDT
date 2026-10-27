@@ -65,7 +65,7 @@ public sealed class ProductsController : Controller
         await LoadCategoriesAsync();
         return View("Form", new ProductFormVm {
             Id = p.Id, Name = p.Name, Description = p.Description, Price = p.Price,
-            Stock = p.Stock, CategoryId = p.CategoryId, IsActive = p.IsActive,
+            Stock = p.Stock, OriginalStock = p.Stock, CategoryId = p.CategoryId, IsActive = p.IsActive,
             CurrentImageUrl = p.ImageUrl
         });
     }
@@ -73,20 +73,48 @@ public sealed class ProductsController : Controller
     [HttpPost, ValidateAntiForgeryToken]
     public async Task<IActionResult> Edit(int id, ProductFormVm vm)
     {
-        var p = await _db.Products.FindAsync(id);
+        var p = await _db.Products.AsNoTracking().FirstOrDefaultAsync(x => x.Id == id);
         if (p == null) return NotFound();
         if (vm.Id != id) return BadRequest();
         await ValidateFormAsync(vm);
+        if (!vm.OriginalStock.HasValue || vm.OriginalStock.Value < 0)
+            ModelState.AddModelError(nameof(vm.OriginalStock), "Thông tin tồn kho đã cũ. Vui lòng tải lại trang sửa sản phẩm.");
         if (!ModelState.IsValid) {
             vm.CurrentImageUrl = p.ImageUrl;
             await LoadCategoriesAsync();
             return View("Form", vm);
         }
-        p.Name = vm.Name.Trim(); p.Description = vm.Description?.Trim();
-        p.Price = vm.Price; p.Stock = vm.Stock; p.CategoryId = vm.CategoryId;
-        p.IsActive = vm.IsActive;
-        if (vm.Image != null) p.ImageUrl = await SaveImageAsync(vm.Image);
-        await _db.SaveChangesAsync();
+
+        // Lệnh UPDATE kiểm tra tồn kho lúc mở form. Nếu Checkout đã trừ kho,
+        // Admin không được lưu giá trị cũ đè lên tồn kho đang có.
+        string? uploadedImage = null;
+        var updateSucceeded = false;
+        try {
+            if (vm.Image != null) uploadedImage = await SaveImageAsync(vm.Image);
+            var name = vm.Name.Trim();
+            var description = vm.Description?.Trim();
+            var selectedImageUrl = uploadedImage ?? p.ImageUrl;
+            var rows = await _db.Products
+                .Where(x => x.Id == id && x.Stock == vm.OriginalStock!.Value)
+                .ExecuteUpdateAsync(setters => setters
+                    .SetProperty(x => x.Name, name)
+                    .SetProperty(x => x.Description, description)
+                    .SetProperty(x => x.Price, vm.Price)
+                    .SetProperty(x => x.Stock, vm.Stock)
+                    .SetProperty(x => x.CategoryId, vm.CategoryId)
+                    .SetProperty(x => x.IsActive, vm.IsActive)
+                    .SetProperty(x => x.ImageUrl, selectedImageUrl));
+            if (rows != 1) {
+                ModelState.AddModelError("", "Tồn kho đã thay đổi bởi đơn hàng hoặc thao tác khác. Tải lại trang trước khi sửa.");
+                vm.CurrentImageUrl = p.ImageUrl;
+                await LoadCategoriesAsync();
+                return View("Form", vm);
+            }
+            updateSucceeded = true;
+        }
+        finally {
+            if (!updateSucceeded && uploadedImage != null) DeleteUploadedImage(uploadedImage);
+        }
         TempData["Success"] = "Đã cập nhật sản phẩm";
         return RedirectToAction(nameof(Index));
     }
@@ -130,6 +158,17 @@ public sealed class ProductsController : Controller
             && System.Text.Encoding.ASCII.GetString(header, 8, 4) == "WEBP";
         if (!(ext is ".jpg" or ".jpeg" ? jpeg : ext == ".png" ? png : webp))
             ModelState.AddModelError(nameof(vm.Image), "Nội dung tệp không khớp định dạng ảnh");
+    }
+
+    private void DeleteUploadedImage(string relativeUrl)
+    {
+        // Chỉ xóa ảnh có đường dẫn do chính controller tạo.
+        var name = Path.GetFileName(relativeUrl);
+        if (name.Length != 32 + Path.GetExtension(name).Length) return;
+        if (!Guid.TryParseExact(Path.GetFileNameWithoutExtension(name), "N", out _)) return;
+        var root = _env.WebRootPath ?? Path.Combine(_env.ContentRootPath, "wwwroot");
+        var path = Path.Combine(root, "images", "products", name);
+        if (System.IO.File.Exists(path)) System.IO.File.Delete(path);
     }
 
     private async Task<string> SaveImageAsync(IFormFile file)
