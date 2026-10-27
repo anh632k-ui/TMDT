@@ -152,7 +152,7 @@ class Tv4StaticChecks(unittest.TestCase):
             source = view.read_text("utf-8")
             with self.subTest(view=view.name):
                 self.assertNotIn("IOrderService của TV3 xử lý", source)
-                self.assertNotRegex(source, r"(?i)\\bTODO\\b|\\bTV[234]\\b")
+                self.assertNotRegex(source, r"(?i)\bTODO\b|\bTV[234]\b")
 
     def test_tv3_integration_contract(self):
         payment = (APP / "Controllers/PaymentController.cs").read_text("utf-8")
