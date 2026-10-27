@@ -25,7 +25,7 @@ public static class DbSeeder
         var admin = await users.FindByEmailAsync(adminEmail);
         if (admin == null) {
             // KHÔNG sử dụng mật khẩu demo trong môi trường thật.
-            var password = Environment.GetEnvironmentVariable("TV4_DEMO_ADMIN_PASSWORD") ?? "Admin@123";
+            var password = Environment.GetEnvironmentVariable("TV4_DEMO_ADMIN_PASSWORD") ?? "Tv4DemoAdmin@2026!";
             admin = new IdentityUser { UserName = adminEmail, Email = adminEmail, EmailConfirmed = true };
             var created = await users.CreateAsync(admin, password);
             if (!created.Succeeded) throw new InvalidOperationException(
