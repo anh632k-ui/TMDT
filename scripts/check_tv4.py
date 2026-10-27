@@ -78,6 +78,27 @@ class Tv4StaticChecks(unittest.TestCase):
                 self.assertIn(mark, s)
         self.assertNotIn("_db.Products.Remove", s)
 
+    def test_admin_stock_edit_is_atomic(self):
+        vm = (APP / "Areas/Admin/ViewModels/ProductFormVm.cs").read_text("utf-8")
+        controller = (APP / "Areas/Admin/Controllers/ProductsController.cs").read_text("utf-8")
+        form = (APP / "Areas/Admin/Views/Products/Form.cshtml").read_text("utf-8")
+        self.assertIn('Range(typeof(decimal), "1"', vm)
+        self.assertIn("OriginalStock", vm)
+        self.assertIn('asp-for="OriginalStock"', form)
+        self.assertIn('asp-for="Price" type="number" step="1" min="1"', form)
+        self.assertIn("x.Stock == vm.OriginalStock!.Value", controller)
+        self.assertIn(".ExecuteUpdateAsync(setters => setters", controller)
+        self.assertIn("DeleteUploadedImage(uploadedImage)", controller)
+
+    def test_backend_patch_package_is_safe(self):
+        import subprocess
+        import sys
+        package = ROOT / "scripts" / "test_tv3_core_patch.py"
+        self.assertTrue(package.is_file())
+        result = subprocess.run([sys.executable, str(package)],
+                                text=True, capture_output=True, timeout=30)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
     def test_voucher_guards(self):
         s = (APP / "Areas/Admin/Controllers/VouchersController.cs").read_text("utf-8")
         for mark in ("vm.EndAt <= vm.StartAt", "vm.Value < 1", "vm.Value > 100",
