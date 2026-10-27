@@ -50,7 +50,7 @@ using (var scope = app.Services.CreateScope())
 }
 ```
 
-Với `DbSeeder`, TV3 cần bảo đảm EF Migrations đã được tạo. Môi trường demo tạo tài khoản `admin@vpp.local` / `Admin@123` khi chưa tồn tại; mật khẩu này không được triển khai sản phẩm thật. Có thể đặt `TV4_DEMO_ADMIN_PASSWORD` để thay mật khẩu seed mới.
+Với `DbSeeder`, TV3 cần bảo đảm EF Migrations đã được tạo. Môi trường demo **khởi tạo mới** tài khoản `admin@vpp.local` với mật khẩu mặc định `Tv4DemoAdmin@2026!` (chỉ dùng ở môi trường học tập); nên đặt biến `TV4_DEMO_ADMIN_PASSWORD` riêng cho từng máy. **Nếu tài khoản đã tồn tại, DbSeeder không thay mật khẩu cũ**: tài khoản từ lần seed trước có thể vẫn dùng `Admin@123` cho đến khi đổi qua Identity. Không dùng mật khẩu demo trên hệ thống thật.
 
 TV3: Sau `Checkout/PlaceOrder`, nếu chọn `Online`, điều hướng `/Payment/Mock/{orderId}`. Nếu `COD`, đơn ở `Pending` và chuyển về `Orders/Success`. URL Mock không thanh toán thật.
 
