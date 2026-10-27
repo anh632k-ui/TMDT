@@ -1,0 +1,60 @@
+@using System.Globalization
+@model Order
+@{
+    ViewData["Title"] = "Chi tiết đơn #" + Model.Id;
+    var vi = new CultureInfo("vi-VN");
+    var items = (IEnumerable<OrderItem>)ViewBag.Items;
+}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="h3">Đơn hàng #@Model.Id</h1>
+    <a asp-action="Index" class="btn btn-outline-secondary">Danh sách đơn</a>
+</div>
+<dl class="row">
+    <dt class="col-sm-3">Khách hàng</dt><dd class="col-sm-9">@ViewBag.Email</dd>
+    <dt class="col-sm-3">Người nhận</dt><dd class="col-sm-9">@Model.ShippingName</dd>
+    <dt class="col-sm-3">Điện thoại</dt><dd class="col-sm-9">@Model.Phone</dd>
+    <dt class="col-sm-3">Địa chỉ giao hàng</dt><dd class="col-sm-9">@Model.Address</dd>
+    <dt class="col-sm-3">Phương thức thanh toán</dt><dd class="col-sm-9">@Model.PaymentMethod</dd>
+    <dt class="col-sm-3">Trạng thái</dt><dd class="col-sm-9 fw-bold">@Model.Status</dd>
+    <dt class="col-sm-3">Voucher</dt><dd class="col-sm-9">@(string.IsNullOrEmpty(Model.VoucherCodes) ? "Không dùng" : Model.VoucherCodes)</dd>
+</dl>
+<div class="table-responsive"><table class="table">
+<thead><tr><th>Sản phẩm</th><th class="text-end">Đơn giá</th><th class="text-end">Số lượng</th><th class="text-end">Thành tiền</th></tr></thead>
+<tbody>
+@foreach (var x in items) {
+<tr><td>@x.ProductName</td><td class="text-end">@x.UnitPrice.ToString("N0",vi)đ</td><td class="text-end">@x.Quantity</td>
+<td class="text-end">@((x.UnitPrice * x.Quantity).ToString("N0",vi))đ</td></tr>
+}
+</tbody></table></div>
+<div class="row"><div class="col-md-6 ms-auto"><table class="table">
+<tr><td>Tạm tính</td><td class="text-end">@Model.Subtotal.ToString("N0",vi)đ</td></tr>
+<tr><td>Giảm sản phẩm</td><td class="text-end">-@Model.DiscountAmount.ToString("N0",vi)đ</td></tr>
+<tr><td>Phí giao hàng</td><td class="text-end">@Model.ShippingFee.ToString("N0",vi)đ</td></tr>
+<tr><td>Giảm vận chuyển</td><td class="text-end">-@Model.ShippingDiscount.ToString("N0",vi)đ</td></tr>
+<tr class="fw-bold"><td>Tổng</td><td class="text-end">@Model.Total.ToString("N0",vi)đ</td></tr>
+</table></div></div>
+<div class="d-flex flex-wrap gap-2 mt-3">
+@if (Model.Status == OrderStatus.Pending || Model.Status == OrderStatus.Paid || Model.Status == OrderStatus.Shipping) {
+    <form asp-action="ChangeStatus" asp-route-id="@Model.Id" method="post" class="d-flex gap-2">
+        @Html.AntiForgeryToken()
+        <select class="form-select" name="status" aria-label="Trạng thái mới">
+            @if (Model.Status == OrderStatus.Pending && Model.PaymentMethod == "COD") {
+                <option value="Shipping">Shipping (đang giao – COD)</option>
+            } else if (Model.Status == OrderStatus.Pending) {
+                <option value="Paid">Paid (đã thanh toán trực tuyến)</option>
+            } else if (Model.Status == OrderStatus.Paid) {
+                <option value="Shipping">Shipping (đang giao)</option>
+            } else {
+                <option value="Completed">Completed (hoàn tất)</option>
+            }
+        </select>
+        <button class="btn btn-primary">Cập nhật trạng thái</button>
+    </form>
+}
+@if (Model.Status == OrderStatus.Pending || Model.Status == OrderStatus.Paid) {
+    <form asp-action="Cancel" asp-route-id="@Model.Id" method="post" onsubmit="return confirm('Bạn muốn hủy đơn này?')">
+        @Html.AntiForgeryToken()
+        <button class="btn btn-outline-danger">Hủy đơn</button>
+    </form>
+}
+</div>

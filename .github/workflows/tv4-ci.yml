@@ -1,0 +1,95 @@
+name: TV4 static audit and isolated .NET build
+
+on:
+  push:
+    branches: [tv4-quantri]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  tv4-static:
+    name: Check TV4 files and test matrix
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Python 3 file checks
+        run: python3 scripts/check_tv4.py
+
+  tv4-standalone:
+    name: Compile TV4 against contract stubs (not full integration)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+      - name: Copy Razor views into temporary compile harness
+        shell: bash
+        run: |
+          mkdir -p tests/TV4ContractHarness/Areas/Admin/Views
+          mkdir -p tests/TV4ContractHarness/Views/Payment
+          cp -R VanPhongPham/Areas/Admin/Views/. tests/TV4ContractHarness/Areas/Admin/Views/
+          cp -R VanPhongPham/Views/Payment/. tests/TV4ContractHarness/Views/Payment/
+      - name: Restore contract harness
+        run: dotnet restore tests/TV4ContractHarness/TV4ContractHarness.csproj
+      - name: Compile controllers, ViewModels, DbSeeder and Razor views
+        run: dotnet build tests/TV4ContractHarness/TV4ContractHarness.csproj --no-restore -c Release
+
+  detect-tv3-project:
+    name: Detect whether TV3 project exists
+    runs-on: ubuntu-latest
+    outputs:
+      available: ${{ steps.core.outputs.available }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check presence of application csproj
+        id: core
+        shell: bash
+        run: |
+          if [ -f VanPhongPham/VanPhongPham.csproj ]; then
+            echo "available=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "available=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::Chua co project TV3; build tich hop se bi SKIPPED, khong tinh PASS."
+          fi
+
+  integration-when-tv3-arrives:
+    name: Actual application build (requires TV3)
+    needs: detect-tv3-project
+    if: needs.detect-tv3-project.outputs.available == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+      - name: Restore actual application
+        run: dotnet restore VanPhongPham/VanPhongPham.csproj
+      - name: Build actual application
+        run: dotnet build VanPhongPham/VanPhongPham.csproj --no-restore -c Release
+
+  tv4-powershell-parser:
+    name: Parse TV4 merge script with Windows PowerShell 5.1
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify ASCII and parse without executing the script
+        shell: powershell
+        run: |
+          $scriptPath = (Resolve-Path 'scripts/merge-tv4-into-group.ps1').Path
+          $bytes = [System.IO.File]::ReadAllBytes($scriptPath)
+          if (@($bytes | Where-Object { $_ -gt 127 }).Count -gt 0) {
+            throw 'Script must be ASCII-only for Windows PowerShell 5.1 compatibility'
+          }
+          $tokens = $null
+          $parseErrors = $null
+          [void][System.Management.Automation.Language.Parser]::ParseFile($scriptPath, [ref]$tokens, [ref]$parseErrors)
+          if ($parseErrors.Count -gt 0) {
+            $parseErrors | Format-List | Out-String | Write-Host
+            throw 'Script parse failed on Windows PowerShell'
+          }
+          Write-Host 'PASS: Windows PowerShell syntax and ASCII encoding'
