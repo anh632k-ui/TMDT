@@ -43,7 +43,7 @@ class Tv4StaticChecks(unittest.TestCase):
         for path in files:
             with self.subTest(path=path):
                 self.assertTrue((APP / path).is_file(), path)
-        for name in ("README.md", "DEMO.md", "TEST_CASES.csv", "INTEGRATION_CHECKLIST.md"):
+        for name in ("README.md", "DEMO.md", "TEST_CASES.csv", "INTEGRATION_CHECKLIST.md", "EVIDENCE_INDEX.md", "BACKUP_AND_VIDEO.md"):
             self.assertTrue((ROOT / "docs" / "TV4" / name).is_file())
 
     def test_admin_controllers_have_auth_and_area(self):
@@ -112,20 +112,47 @@ class Tv4StaticChecks(unittest.TestCase):
         self.assertIn('CategoryId = cats["Giấy"]', s)
         self.assertIn('("Sổ tay bìa cứng A5 (bản giới hạn)","Sổ tay",65000,1)', s)
 
-    def test_test_case_matrix_complete_and_unclaimed(self):
+    def test_test_case_matrix_matches_current_instructions(self):
         with (ROOT / "docs/TV4/TEST_CASES.csv").open(encoding="utf-8-sig", newline="") as f:
-            rows = list(csv.DictReader(f))
-        self.assertEqual(len(rows), 23)
-        self.assertEqual([int(r["STT"]) for r in rows], list(range(1, 24)))
-        self.assertTrue(all(r["Nhóm"] == "Voucher" for r in rows[:14]))
-        self.assertEqual([r["Nhóm"] for r in rows[14:17]], ["Tồn kho", "Bảo mật", "Tồn kho"])
-        self.assertTrue(all(r["Nhóm"] == "Hệ thống" for r in rows[17:]))
-        # Khi có kết quả kiểm thử thật, CI vẫn phải cho phép cập nhật bảng.
-        statuses = {"Chưa chạy", "Đạt", "Không đạt", "PASS", "FAIL"}
+            reader = csv.DictReader(f)
+            rows = list(reader)
+            header = list(reader.fieldnames or [])
+        self.assertEqual(header, [
+            "STT", "Tình huống", "Chuẩn bị", "Các bước",
+            "Kết quả mong đợi", "Kết quả thực tế", "Đạt/Không đạt", "Người sửa"
+        ])
+        self.assertEqual(len(rows), 20)
+        self.assertEqual([int(r["STT"]) for r in rows], list(range(1, 21)))
+        self.assertTrue(all(all(r.get(k) is not None for k in header) for r in rows))
+        for key in ("Tình huống", "Chuẩn bị", "Các bước", "Kết quả mong đợi"):
+            self.assertTrue(all(r[key].strip() for r in rows), key)
+        self.assertIn("LUOTCUOI", rows[12]["Tình huống"] + rows[12]["Các bước"])
+        self.assertIn("hai tab", (rows[13]["Tình huống"] + rows[13]["Các bước"]).lower())
+        self.assertIn("/Admin", rows[18]["Các bước"])
         for row in rows:
-            self.assertIn(row["Trạng thái"], statuses)
-            if row["Trạng thái"] in {"Đạt", "Không đạt", "PASS", "FAIL"}:
-                self.assertTrue(row["Kết quả thực tế"].strip(), f"Thiếu bằng chứng TC{row['STT']}")
+            self.assertIn(row["Đạt/Không đạt"], {"Chưa chạy", "Đạt", "Không đạt"})
+            if row["Đạt/Không đạt"] != "Chưa chạy":
+                self.assertTrue(row["Kết quả thực tế"].strip(),
+                                f"TC{row['STT']} cannot be marked complete without actual observations")
+
+    def test_demo_a_b_c_and_safety_docs(self):
+        demo = (ROOT / "docs/TV4/DEMO.md").read_text("utf-8")
+        for mark in ("A – Không bán vượt kho", "B – Không vượt lượt voucher",
+                     "C – Không đặt đơn trùng", "hai tab", "Lần 1", "Lần 2"):
+            self.assertIn(mark, demo)
+        for name in ("EVIDENCE_INDEX.md", "BACKUP_AND_VIDEO.md"):
+            self.assertTrue((ROOT / "docs" / "TV4" / name).is_file())
+        backup = (ROOT / "docs/TV4/BACKUP_AND_VIDEO.md").read_text("utf-8")
+        self.assertIn("RESTORE VERIFYONLY", backup)
+        self.assertIn("Không push .bak", backup)
+
+    def test_no_internal_note_in_admin_razor_views(self):
+        root = APP / "Areas/Admin/Views"
+        for view in root.rglob("*.cshtml"):
+            source = view.read_text("utf-8")
+            with self.subTest(view=view.name):
+                self.assertNotIn("IOrderService của TV3 xử lý", source)
+                self.assertNotRegex(source, r"(?i)\\bTODO\\b|\\bTV[234]\\b")
 
     def test_tv3_integration_contract(self):
         payment = (APP / "Controllers/PaymentController.cs").read_text("utf-8")
