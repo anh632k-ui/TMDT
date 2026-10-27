@@ -8,6 +8,7 @@
 <form asp-action="@(edit ? "Edit" : "Create")" asp-route-id="@Model.Id" method="post" enctype="multipart/form-data">
     @Html.AntiForgeryToken()
     <input asp-for="Id" type="hidden" />
+    @if (edit) { <input asp-for="OriginalStock" type="hidden" /> }
     <div asp-validation-summary="All" class="text-danger mb-3"></div>
     <div class="mb-3"><label asp-for="Name" class="form-label">Tên sản phẩm</label>
         <input asp-for="Name" class="form-control" /><span asp-validation-for="Name" class="text-danger"></span></div>
@@ -15,7 +16,7 @@
         <textarea asp-for="Description" class="form-control" rows="4"></textarea></div>
     <div class="row g-3 mb-3">
         <div class="col-md-4"><label asp-for="Price" class="form-label">Giá bán (VNĐ)</label>
-            <input asp-for="Price" type="number" step="1" min="0" class="form-control" /><span asp-validation-for="Price" class="text-danger"></span></div>
+            <input asp-for="Price" type="number" step="1" min="1" class="form-control" /><span asp-validation-for="Price" class="text-danger"></span></div>
         <div class="col-md-4"><label asp-for="Stock" class="form-label">Tồn kho</label>
             <input asp-for="Stock" type="number" min="0" class="form-control" /><span asp-validation-for="Stock" class="text-danger"></span></div>
         <div class="col-md-4"><label asp-for="CategoryId" class="form-label">Danh mục</label>
